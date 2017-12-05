@@ -16,5 +16,12 @@ function pCompileTSCW(configFile, watchDir){
     });
 }
 
+function pTSCW(watchDir, callback){
+    watch(watchDir, { recursive: true }, function(evt, name) {
+        if (callback) callback();
+    });
+}
+
 exports.compileTSC = pCompileTSC;
 exports.compileTSCW = pCompileTSCW;
+exports.TSCW = pTSCW;

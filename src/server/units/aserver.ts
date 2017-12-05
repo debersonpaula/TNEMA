@@ -20,8 +20,18 @@ class AServer extends TServerObject {
         self.db = self.SOwner.Find(MServer);
         self.RegisterStandardModels();
 
+        // define route to user registration
+        let user = this.SOwner.AddUseRouter('/user');
+
+        // define route to add user
+        user.post('/', function (req: Request, res: Response){
+            const username = req.body.username,
+                userpass = req.body.userpass,
+                userpass2 = req.body.userpass2;
+        });
+
+
         this.SOwner.AddRouter('/register')
-            .get(this.RouteGetRegister)
             .post(function(req: Request, res: Response){
                 const username = req.body.username,
                     userpass = req.body.userpass,
@@ -50,9 +60,9 @@ class AServer extends TServerObject {
                 }
             });
     }
-    private RouteGetRegister(req:Request,res:Response){
-        res.send(DefAStandard.StandardViews.RouteGetRegister);
-    }
+
+    DoOnDestroy() {}
+    
     // private RoutePostRegister
     private RegisterStandardModels(){
         if (this.db){
@@ -64,27 +74,6 @@ class AServer extends TServerObject {
 }
 
 export let DefAStandard = {
-    StandardViews: {
-        RouteGetRegister: `
-        <form action="/register" method="post">
-            <div>
-                <label>Username:</label>
-                <input type="text" name="username"/>
-            </div>
-            <div>
-                <label>Password:</label>
-                <input type="password" name="userpass"/>
-            </div>
-            <div>
-                <label>Confirm Password:</label>
-                <input type="password" name="userpass2"/>
-            </div>
-            <div>
-                <input type="submit" value="Log In"/>
-            </div>
-        </form>
-        `
-    },
     StandardModels: [
         {
             Name: 'dbUsers',

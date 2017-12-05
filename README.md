@@ -1,6 +1,6 @@
 # TNEMA
 
-ON WORKING...
+STILL ON WORKING...
 
 Server Module with: TypeScript + Node + Express + MongoDB + Authentication
 
@@ -17,7 +17,7 @@ Requires TypeScript
 To start a server with static routing on './public':
 
 ```
-const app = require('tnemserver');
+const app = require('tnema');
 const server = app.createServer();
 
 server.httpServer.AddStatic('./public');
@@ -27,7 +27,7 @@ server.httpServer.Listen();
 To compile TypeScript based on config file:
 
 ```
-const app = require('tnemserver');
+const app = require('tnema');
 app.tools.compileTSC('config file');
 ```
 
@@ -35,6 +35,6 @@ app.tools.compileTSC('config file');
 To compile TypeScript based on config file and watch for any changes:
 
 ```
-const app = require('tnemserver');
+const app = require('tnema');
 app.tools.compileTSCW('config file','watch dir');
 ```

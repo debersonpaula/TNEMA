@@ -12,36 +12,42 @@ import {TServer, TServerObject} from './tserver';
 
 class MServer extends TServerObject {
 
-    // protected db: mongoose.Connection;
+    protected mongoApp: mongoose.Mongoose;
     protected models: Array<TModel>;
     public mongoURI: string;
 
     constructor(AOwner: TServer) {
         super(AOwner);
-        // AOwner.Options.mongoURL = '';
         this.models = [];
+        this.mongoApp = new mongoose.Mongoose;
     }
 
     DoBeforeListen() {
         const dbURI: string = this.mongoURI;
         if (dbURI) {
-            mongoose.connection.on('connected', function(){ console.log('Connected to MongoDB, URL = ' + dbURI); });
-            mongoose.connection.on('error', function(err: any){ console.log('Not connected to MongoDB => Error: ' + err); });
-            mongoose.connection.on('disconnected', function(){ console.log('Disconnected to MongoDB, URL = '  + dbURI); });
-            mongoose.connection.on('open', function(){ console.log('Connection with MongoDB is open.'); });
-            mongoose.connect(dbURI, {useMongoClient: true});
+            this.mongoApp.connection.on('connected', function(){ console.log('Connected to MongoDB, URL = ' + dbURI); });
+            this.mongoApp.connection.on('error', function(err: any){ console.log('Not connected to MongoDB => Error: ' + err); });
+            this.mongoApp.connection.on('disconnected', function(){ console.log('Disconnected to MongoDB, URL = '  + dbURI); });
+            this.mongoApp.connection.on('open', function(){ console.log('Connection with MongoDB is open.'); });
+            this.mongoApp.connect(dbURI, {useMongoClient: true});
         }
     }
 
     DoOnClose() {
-        mongoose.disconnect();
+        this.mongoApp.disconnect();
+    }
+
+    DoOnDestroy() {
+        this.models = [];
+        delete this.models;
+        delete this.mongoApp;
     }
 
     AddModel(Schema: mongoose.SchemaDefinition, ModelName: string) {
         const content = new TModel(this.SOwner);
         content.Name = ModelName;
         content.Schema = new mongoose.Schema(Schema);
-        content.Model = mongoose.model(ModelName, content.Schema);
+        content.Model = this.mongoApp.model(ModelName, content.Schema);
         this.models.push(content);
     }
 

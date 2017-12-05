@@ -19,7 +19,6 @@ class TServer {
     protected objects: Array<TServerObject>;
     protected server: http.Server;
     // server options
-    // public Options: TServerOptions;
     public httpPort: number;
 
     // constructor
@@ -69,9 +68,16 @@ class TServer {
         return this.app.route(uri);
     }
 
-    // add router use
+    // add router use direct to handler
     public AddUse(uri: string,  handler: any): void {
         this.app.use(uri, handler);
+    }
+
+    // add router use Router handler
+    public AddUseRouter(uri: string): express.Router {
+        const router: express.Router = express.Router();
+        this.app.use(uri, router);
+        return router;
     }
 
     // server initializator
@@ -108,6 +114,21 @@ class TServer {
         this.server.close();
         this.Log(`HTTP Server Stopped.`);
     }
+
+    // destroy instance
+    public Destroy(): void {
+        // check if server is running
+        if (this.server.listening){
+            this.Stop();
+        }
+        // run objects DoDestroy
+        this.objects.forEach(element => {
+            element.DoOnDestroy();
+        });
+        delete this.app;
+        delete this.objects;
+        delete this.server;
+    }
 }
 
 // Server Object => to handle child objects for the server
@@ -119,6 +140,7 @@ class TServerObject {
     }
     DoBeforeListen() {}
     DoOnClose() {}
+    DoOnDestroy() {}
 }
 
 export {TServer, TServerObject};
