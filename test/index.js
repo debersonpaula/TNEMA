@@ -1,5 +1,8 @@
 // initializes app and start compilation
 const comp = require('../compiler/build');
+const logger = require('../compiler/logger');
+
+logger('\n === START APPLICATION === \n', 'FgCyan');
 comp.compileTSC('./compiler/build.config.json');
 
 // define variables
@@ -10,20 +13,32 @@ startServer();
 
 // run watch
 comp.TSCW(__dirname + '/../src/server/',function(){
-    stopServer();
-    console.log('Rebuilding...');
-    comp.compileTSC('./compiler/build.config.json');
-    startServer();
+    stopServer( function() {
+        //logger('\n === Rebuilding === \n', 'FgGreen');
+        //comp.compileTSC('./compiler/build.config.json');
+        //startServer();
+
+        console.log('end stop server');
+    });
 });
 
 function startServer(){
+    server = 0;
     server = require('../lib/server');
     server.httpServer.AddStatic(__dirname + '/public');
     server.mongoServer.mongoURI = 'mongodb://localhost/test';
     server.httpServer.Listen();
 }
 
-function stopServer(){
+function stopServer(callback){
+    server.httpServer.Stop();
     server.httpServer.Destroy();
-    delete require.cache[require.resolve('../lib/server')];
+
+    /*
+    setTimeout(function(){
+        console.log('calling callback');
+        delete require.cache[require.resolve('../lib/server')];        
+        if (callback) callback;        
+    }, 1500);
+    */
 }

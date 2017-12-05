@@ -2,6 +2,7 @@ const ts = require("typescript");
 const fs = require("fs");
 const path = require("path");
 const process = require("process");
+const logger = require('./logger');
 
 function reportDiagnostics(diagnostics) { 
     diagnostics.forEach(diagnostic => {
@@ -11,7 +12,7 @@ function reportDiagnostics(diagnostics) {
             message += ' ' + diagnostic.file.fileName + ' ' + where.line + ', ' + where.character + 1;
         }
         message += ": " + ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-        console.log(message);
+        logger(message, 'FgYellow');
     });
 }
 function readConfigFile(configFileName) { 

@@ -11,3 +11,5 @@ exports.createServer = function(){
 }
 
 exports.tools = require('./compiler/build');
+
+exports.logger = require('./compiler/logger');

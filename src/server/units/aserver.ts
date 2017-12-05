@@ -7,6 +7,7 @@
 * https://github.com/debersonpaula
 */
 import { Request, Response } from 'express';
+import * as session from 'express-session';
 import { TServer, TServerObject } from './tserver';
 import { MServer, TModel } from './mserver';
 
@@ -28,37 +29,32 @@ class AServer extends TServerObject {
             const username = req.body.username,
                 userpass = req.body.userpass,
                 userpass2 = req.body.userpass2;
+            if (!username || !userpass || userpass !== userpass2) {
+                self.SendResponse(res,'INVALID','User Name and Password fields cant be blank and Passwords should be the same.');
+            } else {
+                const getdata: TModel = self.db.SearchModel('dbUsers');
+                if (getdata) {
+                    // locate if the user exists
+                    getdata.Find({username: username},function(result){
+                        if (result.length){
+                            self.SendResponse(res,'INVALID','This user already exists.');
+                        }else {
+                            // create user
+                            getdata.Save({username: username, userpass: userpass}, function(result: any){
+                                if (result) {
+                                    self.SendResponse(res,'ACCEPTED','User registered.');
+                                }
+                            });
+                        }
+                    });
+                }
+            }
         });
 
-
-        this.SOwner.AddRouter('/register')
-            .post(function(req: Request, res: Response){
-                const username = req.body.username,
-                    userpass = req.body.userpass,
-                    userpass2 = req.body.userpass2;
-                if (!username || !userpass || userpass !== userpass2) {
-                    res.send('User Name and Password fields cant be blank and Passwords should be the same.');
-                }else {
-                    const getdata: TModel = self.db.SearchModel('dbUsers');
-                    if (getdata) {
-                        // locate if the user exists
-                        getdata.Find({username: username},function(result){
-                            if (result.length){
-                                res.status(200);
-                                res.send('this user already exists');
-                            }else {
-                                // create user
-                                getdata.Save({username: username, userpass: userpass}, function(result: any){
-                                    if (result) {
-                                        res.status(200);
-                                        res.send('user registered');
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }
-            });
+        // define route to add user
+        user.get('/login', function (req: Request, res: Response){
+            res.send('teste');
+        });
     }
 
     DoOnDestroy() {}
@@ -70,6 +66,36 @@ class AServer extends TServerObject {
                 this.db.AddModel(model.Schema,model.Name);
             });
         }
+    }
+
+    //standard way to send response
+    private SendResponse(res: Response, code: string, msg: string): void {
+        const resp = { code: code, msg: msg};
+        res.json(resp);
+    }
+
+    //Login User
+    private UserLogin(username: string, userpass: string, res: Response): boolean {
+        let result = false;
+        const self = this;
+        //const getdata: TModel = this.db.SearchModel('dbUsers');
+        if (username && userpass){
+            const getdata: TModel = this.db.SearchModel('dbUsers');
+            if (getdata) {
+                // locate if the user and pass matches
+                getdata.Find({username: username, userpass: userpass},function(result){
+                    // if result > 0, user found
+                    if (result.length){
+                        self.SendResponse(res,'ACCEPTED','User logged.');
+                    } else {
+                        self.SendResponse(res,'INVALID','User and Password not match.');
+                    }
+                });
+            }
+        } else {
+            this.SendResponse(res,'INVALID','User Name and Password fields cant be blank.');
+        }
+        return result;
     }
 }
 

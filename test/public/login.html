@@ -3,8 +3,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     </head>
 <body>
-    <h4>Register your information below</h4>
-    <form id="formRegistration">
+    <h4>Login</h4>
+    <form id="formLogin">
         <div>
             <label>Username:</label>
             <input type="text" name="username"/>
@@ -14,24 +14,19 @@
             <input type="password" name="userpass"/>
         </div>
         <div>
-            <label>Confirm Password:</label>
-            <input type="password" name="userpass2"/>
-        </div>
-        <div>
-            <input type="submit" value="Submit"/>
+            <input type="submit" value="Log In"/>
         </div>
     </form>
 
     <script>
-        var form = $('#formRegistration');
+        var form = $('#formLogin');
 
         form.submit(function( event ) {
-            //alert( "Handler for .submit() called." );
             var formData = form.serialize();
 
             var sendAjax = $.ajax({
                 type : 'POST',
-                url  : '/user',
+                url  : '/user/login',
                 data : formData,
                 dataType : 'json',
                 encode : true

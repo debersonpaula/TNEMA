@@ -81,8 +81,8 @@ class TServer {
     }
 
     // server initializator
-    public Listen(ListenPort?: number) {
-        // const opts = this.Options;
+    public Listen( done?: () => void ) {
+        let ListenPort = 3000;
         const self = this;
         if (!this.httpPort) {
             self.Log('HTTP Port was not been assigned to options');
@@ -95,13 +95,19 @@ class TServer {
             // listen to the port
             this.server.listen(ListenPort, function(err: any) {
                 if (err) {
-                    self.Log(`HTTP Server can't be active on port ${ListenPort}`);
+                    self.Log(`\nHTTP Server can't be active on port ${ListenPort}`);
                     throw err;
                 }else {
                     self.Log(`HTTP Server active on port ${ListenPort}`);
+                    if (done) done();
                 }
             });
         }
+    }
+
+    // Do actions before listen
+    protected DoBeforeListen( done?: () => void , fail?: () => void ) {
+
     }
 
     // stop server
@@ -117,14 +123,11 @@ class TServer {
 
     // destroy instance
     public Destroy(): void {
-        // check if server is running
-        if (this.server.listening){
-            this.Stop();
-        }
         // run objects DoDestroy
         this.objects.forEach(element => {
             element.DoOnDestroy();
         });
+        // clear all properties
         delete this.app;
         delete this.objects;
         delete this.server;
@@ -138,7 +141,7 @@ class TServerObject {
         this.SOwner = AOwner;
         AOwner.Add(this);
     }
-    DoBeforeListen() {}
+    DoBeforeListen( done?: () => void ) { if (done) done(); }
     DoOnClose() {}
     DoOnDestroy() {}
 }

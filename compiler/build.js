@@ -1,17 +1,19 @@
 const tsc = require('./tsc');
 const watch = require('node-watch');
+const logger = require('./logger');
 
 function pCompileTSC(configFile){
     //compile TypeScript server files
-    process.stdout.write('Start compile on tsc...');
+    logger('\nCompiling TypeScript...');
     tsc(configFile);
-    process.stdout.write('compiled!\n');
+    logger('compiled!\n\n');
 }
 
 function pCompileTSCW(configFile, watchDir){
     pCompileTSC(configFile);
     watch(watchDir, { recursive: true }, function(evt, name) {
         console.log('Files changed!');
+        logger('\n --- Rebuilding ---\n','FgGreen');
         pCompileTSC(configFile);
     });
 }

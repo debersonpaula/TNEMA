@@ -33,7 +33,7 @@ class MServer extends TServerObject {
         }
     }
 
-    DoOnClose() {
+    DoOnClose(fn?: (error: any) => void) {
         this.mongoApp.disconnect();
     }
 
