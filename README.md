@@ -1,6 +1,6 @@
 # TNEMA
 
-STILL ON WORKING...
+STILL ON WORKING...NOT FUNCTIONAL YET.
 
 Server Module with: TypeScript + Node + Express + MongoDB + Authentication
 
