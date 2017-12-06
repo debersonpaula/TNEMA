@@ -18,13 +18,13 @@ var comp = require('./compiler/build');
 
 logger('\n === START COMPILATION === \n', 'FgCyan');
 //deleteFolderRecursive(__dirname + '/lib');
-//comp.compileTSC(__dirname + '/tsconfig.json');
+comp.compileTSC(__dirname + '/tsconfig.json');
 
 // define variables
 var server;
 
 // run server first
-//startServer();
+startServer();
 
 function startServer(){
 
@@ -38,10 +38,11 @@ function startServer(){
     logger('=== CREATE APPLICATION ===\n', 'FgCyan');
     server.Create(function(){
         logger('=== CREATE DONE ===\n\n', 'FgGreen');
+        runWatch();
     });
 }
 
-function RunWatch(){
+function runWatch(){
     /*---------------------------------------------*/
     logger('=== RUNNING WATCH ===\n', 'FgCyan');
     var watcher = comp.TSCW(__dirname + '/src/server/',function(){
