@@ -19,11 +19,19 @@ class TObject{
 
     // methods
     public Create(fn?: Function) {
+        this.DoCreate(fn);
+    }
+    public Destroy(fn?: Function) {
+        this.DoDestroy(fn);
+    }
+
+    // protected methods
+    protected DoCreate(fn?: Function) {
         DebugLog('TObject/Create');
         this.OnCreate = true;
         fn && fn();
     }
-    public Destroy(fn?: Function) {
+    protected DoDestroy(fn?: Function) {
         DebugLog('TObject/Destroy');
         this.OnDestroy = true;
         fn && fn();

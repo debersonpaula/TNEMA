@@ -61,9 +61,6 @@ class THttpServer extends TObject {
 
     // start server
     public Create(fn?: Function) {
-        //DebugLog('TObj1/Create','35');
-        
-
         let ListenPort = 3000;
         const self = this;
         if (!this.httpPort) {
@@ -77,13 +74,20 @@ class THttpServer extends TObject {
                     throw err;
                 }else {
                     console.log(`HTTP Server active on port ${ListenPort}`);
-                    //self.super.Create(fn);
-                    
-                    
+                    self.DoCreate(fn);
                 }
             });
         }
+    }
 
+    // stop server
+    public Destroy(fn?: Function) {
+        const self = this;
+        // close server connection
+        this.server.close(function(){
+            console.log(`HTTP Server Stopped.`);
+            self.DoDestroy(fn);
+        });        
     }
 }
 // ===================================================
