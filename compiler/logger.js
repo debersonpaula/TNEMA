@@ -32,9 +32,11 @@ const generateLog = function() {
 
 function log ( msg , color) {
     if (color){
-        generateLog(colors[color], msg, colors.Reset);
+        //generateLog(colors[color], msg, colors.Reset);
+        console.log(colors[color], msg, colors.Reset);
     } else {
-        process.stdout.write(msg);
+        //process.stdout.write(msg);
+        console.log(msg);
     }
 }
 

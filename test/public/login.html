@@ -1,6 +1,7 @@
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="/auth.js"></script>
     </head>
 <body>
     <h4>Login</h4>
@@ -18,26 +19,11 @@
         </div>
     </form>
 
+    <div id="loginmsg"></div>
+    <div><a href="/">Home</a></div>
+
     <script>
-        var form = $('#formLogin');
-
-        form.submit(function( event ) {
-            var formData = form.serialize();
-
-            var sendAjax = $.ajax({
-                type : 'POST',
-                url  : '/user/login',
-                data : formData,
-                dataType : 'json',
-                encode : true
-            });
-
-            sendAjax.done(function(data){
-                console.log(data);
-            });
-
-            event.preventDefault();
-        });
+        DefineFormLogin('#formLogin');
     </script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 
 // ===================================================
 // === imports =======================================
-import { TObject } from './tobjectlist';
+import { TObject } from 'tobjectlist';
 import { THttpServer } from './httpServer';
 import { TModel, TMongoServer } from './mongoServer';
 
@@ -28,6 +28,12 @@ class TAuthServer extends TObject {
         super();
         this.hServer = HttpServer;
         this.mServer = MongoServer;
+        //start session
+        HttpServer.AddMiddleware(session({
+            secret: 'Was8-df90-poqw',
+            resave: true,
+            saveUninitialized: true
+        }));
     }
 
     // start server
@@ -56,13 +62,13 @@ class TAuthServer extends TObject {
     }
 
     //standard way to send response
-    private SendResponse(res: Response, code: string, msg: string): void {
+    private SendResponse(res: Response, code: string, msg: string): Response {
         const resp = { code: code, msg: msg};
-        res.json(resp);
+        return res.json(resp);
     }
 
     //Login User
-    private UserLogin(username: string, userpass: string, res: Response): void {
+    private UserLogin(username: string, userpass: string, res: Response, req: any): void {
         const self = this;
         //const getdata: TModel = this.db.SearchModel('dbUsers');
         if (username && userpass){
@@ -72,6 +78,7 @@ class TAuthServer extends TObject {
                 getdata.Find({username: username, userpass: userpass},function(result){
                     // if result > 0, user found
                     if (result.length){
+                        self.CreateSession(req, username);
                         self.SendResponse(res,'ACCEPTED','User logged.');
                     } else {
                         self.SendResponse(res,'INVALID','User and Password not match.');
@@ -109,11 +116,28 @@ class TAuthServer extends TObject {
         }        
     }
 
+    //method to register user in session
+    private CreateSession(req: any, username: string){
+        req.session.username = username;
+        //req.session.userid = userdata._id;
+        req.session.logged = true;
+    }
+
     // Init Routes
     private InitRoutes(){
         const self = this;
         // define route to user registration
         let user = this.hServer.AddUseRouter('/user');
+
+        // Authentication and Authorization Middleware
+        var auth = function(req: Request, res: Response, next: Function) {
+            if (req.session && req.session.logged === true)
+                return next();
+            else{
+                res.sendStatus(401);
+                return self.SendResponse(res,'UNAUTHORIZED','You are not logged!');
+            }
+        };
 
         // define route to add user
         user.post('/', function (req: Request, res: Response){
@@ -124,12 +148,17 @@ class TAuthServer extends TObject {
                 res);
         });
 
-        // define route to add user
+        // define route to log user
         user.post('/login', function (req: Request, res: Response){
             self.UserLogin(
                 req.body.username,
                 req.body.userpass,
-                res);
+                res, req);
+        });
+
+        // define route to get user session
+        user.get('/', auth, function (req: Request, res: Response){
+            return self.SendResponse(res,'LOGGED','You are not logged!');
         });
     }
 }

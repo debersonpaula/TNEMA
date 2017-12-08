@@ -22,11 +22,12 @@
         </div>
     </form>
 
+    
+
     <script>
         var form = $('#formRegistration');
 
         form.submit(function( event ) {
-            //alert( "Handler for .submit() called." );
             var formData = form.serialize();
 
             var sendAjax = $.ajax({
@@ -42,6 +43,8 @@
             });
 
             event.preventDefault();
+            event.stopPropagation();
+            return false;
         });
     </script>
 </body>

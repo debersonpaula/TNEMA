@@ -9,7 +9,8 @@
 
 // ===================================================
 // === imports =======================================
-import { TObjectList } from './units/tobjectlist';
+//import { TObjectList } from './units/tobjectlist';
+import { TObjectList } from 'tobjectlist';
 import { THttpServer } from './units/httpServer';
 import { TMongoServer } from './units/mongoServer';
 import { TAuthServer } from './units/authServer';
@@ -31,8 +32,25 @@ class TNEMAServer extends TObjectList{
         this.AddObject(this.MongoServer);
         this.AddObject(this.AuthServer);
     }
+
+    // FORWARDERS
+
+    // set or get http port
+    public port(port?: number): number {
+        if (port){
+            this.HttpServer.httpPort = port;   
+        }
+        return this.HttpServer.httpPort;
+    }
+
+    // set or get mongo uri
+    public mongoURI(uri?: string): string {
+        if (uri){
+            this.MongoServer.mongoURI = uri;   
+        }
+        return this.MongoServer.mongoURI;
+    }
 }
 // ===================================================
 // === exports =======================================
-module.exports = new TNEMAServer;
-
+export {TNEMAServer}

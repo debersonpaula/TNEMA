@@ -2,7 +2,7 @@
 
 STILL ON WORKING...NOT FUNCTIONAL YET.
 
-Server Module with: TypeScript + Node + Express + MongoDB + Authentication
+Server Bundle with: TypeScript + Node + Express + MongoDB + Authentication
 
 Requires TypeScript
 

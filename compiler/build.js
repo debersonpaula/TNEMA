@@ -4,16 +4,16 @@ const logger = require('./logger');
 
 function pCompileTSC(configFile){
     //compile TypeScript server files
-    logger('\nCompiling TypeScript...');
+    logger('Compiling TypeScript:');
     tsc(configFile);
-    logger('compiled!\n\n');
+    logger('      compiled!');
 }
 
 function pCompileTSCW(configFile, watchDir){
     pCompileTSC(configFile);
     watch(watchDir, { recursive: true }, function(evt, name) {
         console.log('Files changed!');
-        logger('\n --- Rebuilding ---\n','FgGreen');
+        logger('--- Rebuilding ---','FgGreen');
         pCompileTSC(configFile);
     });
 }

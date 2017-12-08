@@ -8,7 +8,7 @@
 
 // ===================================================
 // === imports =======================================
-import { TObject } from './tobjectlist';
+import { TObject } from 'tobjectlist';
 import * as mongoose from 'mongoose';
 
 // ===================================================
