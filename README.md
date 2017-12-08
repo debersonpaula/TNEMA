@@ -3,7 +3,6 @@
 STILL ON WORKING...NOT FUNCTIONAL YET.
 
 Server Bundle with: TypeScript + Node + Express + MongoDB + Authentication
-
 Requires TypeScript
 
 `npm install typescript --save-dev`

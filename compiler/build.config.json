@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "es5",
-    "outDir": "../lib/",
-    "strict": true
-  },
-  "include":["../src/server/**/*.ts"],
-  "exclude":["node_modules"]
-}

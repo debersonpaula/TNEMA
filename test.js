@@ -1,5 +1,8 @@
-const logger = require('./compiler/logger');
-const comp = require('./compiler/build');
+//const logger = require('./compiler/logger');
+//const comp = require('./compiler/build');
+
+const logger = require("debugtxt");
+const comp = require("tscbuilder");
 
 // run first
 startServer();
@@ -9,31 +12,31 @@ startServer();
 /************************************************************/
 function startServer(){
     /*---------------------------------------------*/
-    logger('==================================================================', 'FgBlue');
-    logger('=== START COMPILATION ===', 'FgCyan');
-    comp.compileTSC(__dirname + '/tsconfig.json');
+    logger.writelnR('!FgBlue','==================================================================');
+    logger.writelnR('!FgCyan','=== START COMPILATION ===');
+    comp.CompileTSC(__dirname + '/tsconfig.json');
 
     /*---------------------------------------------*/
-    logger('=== START SERVER ===', 'FgCyan');
-    var nema = require('./lib/main');
-    server = new nema.TNEMAServer;
+    logger.writelnR('!FgCyan','=== START SERVER ===');
+    var tnema = require('./lib/main');
+    server = new tnema.TNEMAServer;
     server.port(3000);
     server.mongoURI('mongodb://localhost/test');
     server.HttpServer.AddStatic(__dirname + '/test/public');
     
     /*---------------------------------------------*/
-    logger('=== CREATE APPLICATION ===', 'FgCyan');
+    logger.writelnR('!FgCyan','=== CREATE APPLICATION ===');
     server.Create(function(){
-        logger('=== READY ===', 'FgGreen');
+        logger.writelnR('!FgGreen','=== READY ===');
         runWatch();
     });
 }
 
 function runWatch(){
     /*---------------------------------------------*/
-    logger('=== RUNNING WATCH ===', 'FgCyan');
-    var watcher = comp.TSCW(__dirname + '/src/server/',function(){
-        logger('Rebuild...', 'FgGreen');
+    logger.writelnR('!FgCyan','=== RUNNING WATCH ===');
+    var watcher = comp.Watcher(__dirname + '/src/server/',function(){
+        logger.writelnR('!FgGreen','Rebuild');
         watcher.close();
         stopServer();
     });
@@ -42,10 +45,10 @@ function runWatch(){
 
 function stopServer() {
     /*---------------------------------------------*/
-    logger('=== STOPPING SERVER ===', 'FgCyan');
+    logger.writelnR('!FgCyan','=== STOPPING SERVER ===');
     server.Destroy(function(){
         // clear cache of server component
-        logger('Clear cache of server component', 'FgBlue');
+        logger.writelnR('!FgBlue','Clear cache of server component');
         delete require.cache[require.resolve('./lib/main')];
         // restart server
         startServer();

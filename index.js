@@ -6,10 +6,6 @@
 
 'use strict';
 
-exports.createServer = function(){
-    return require('./lib/server');
-}
-
+exports.TNEMAServer = require('./lib/main').TNEMAServer;
 exports.tools = require('./compiler/build');
-
 exports.logger = require('./compiler/logger');

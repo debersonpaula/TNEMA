@@ -14,5 +14,5 @@ var deleteFolderRecursive = function(path) {
 };
 
 deleteFolderRecursive(__dirname + '/lib');
-var comp = require('./compiler/build');
-comp.compileTSC(__dirname + '/tsconfig.json');
+const comp = require("tscbuilder");
+comp.CompileTSC(__dirname + '/tsconfig.json');
