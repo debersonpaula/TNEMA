@@ -11,10 +11,18 @@ function CheckSession(elementID){
 
     sendAjax.done(function(data){
         console.log(data);
+
         if (data.code == 'LOGGED'){
-            panel.html('Logged');
+            panel.html('Logged | <button id="logout">Logout</button>');
+            $('#logout').click(function(){
+                console.log('Action = Logout');
+                $.ajax({type:'GET', url:'/user/logout'}).done(function(data){
+                    console.log(data);
+                    window.location.replace('/');
+                });
+            });
         } else {
-            
+            panel.html('<a href="/register.html">Register</a> | <a href="/login.html">LogIn</a>');
         }
     });
 

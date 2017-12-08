@@ -59,8 +59,9 @@ class THttpServer extends TObject {
     // stop server
     public Destroy(fn?: Function) {
         const self = this;
+        // clear all routes
+        self.ClearRoutes();
         // close server connection
-        //this.server.close(function(){
         let server: any = this.server;
         // force all connections to disconnect
         server.destroy(function(){
@@ -102,6 +103,24 @@ class THttpServer extends TObject {
     public AddMiddleware(handler: express.RequestHandler){
         this.app.use(handler);
     }
+
+    // clear all routes
+    private ClearRoutes(){
+        /*
+        for (var i = this.app.routes.get.length - 1; i >= 0; i--) {
+            this.app.routes.get.splice(i, 1);
+        }
+        */
+        var routes = this.app._router.stack;
+        /*
+        routes.forEach( function removeMiddlewares(route: any, i: number, routes: any){
+
+        } );
+        */
+        for (var i in routes){
+            routes.splice(0,1);
+        }
+    }
 }
 // ===================================================
 // === auxiliary function ============================
@@ -109,8 +128,6 @@ function enableDestroy(server: any) {
     let connections: any[] = [];
   
     server.on('connection', function(conn: any) {
-      //var key = conn.remoteAddress + ':' + conn.remotePort;
-      //connections[key] = conn;
       let key = connections.push(conn);
       conn.on('close', function() {
         delete connections[key];

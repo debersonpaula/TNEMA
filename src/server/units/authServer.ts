@@ -15,6 +15,7 @@ import { TModel, TMongoServer } from './mongoServer';
 
 import { Request, Response } from 'express';
 import * as session from 'express-session';
+import { Router } from 'express-serve-static-core';
 
 // ===================================================
 // === classes =======================================
@@ -22,6 +23,7 @@ class TAuthServer extends TObject {
     // components
     private hServer: THttpServer;
     private mServer: TMongoServer;
+    private userAPI: Router;
     
     // constructor
     constructor(HttpServer: THttpServer, MongoServer: TMongoServer) {
@@ -34,6 +36,8 @@ class TAuthServer extends TObject {
             resave: true,
             saveUninitialized: true
         }));
+        //get user api
+        this.userAPI = this.hServer.AddUseRouter('/user');
     }
 
     // start server
@@ -48,6 +52,8 @@ class TAuthServer extends TObject {
     // stop server
     public Destroy(fn?: Function) {
         const self = this;
+        //self.userAPI
+        //delete self.userAPI;
         console.log(`Auth Server Stopped.`);
         self.DoDestroy(fn);
     }
@@ -127,14 +133,14 @@ class TAuthServer extends TObject {
     private InitRoutes(){
         const self = this;
         // define route to user registration
-        let user = this.hServer.AddUseRouter('/user');
+        //let user = this.hServer.AddUseRouter('/user');
+        let user = this.userAPI;
 
         // Authentication and Authorization Middleware
         var auth = function(req: Request, res: Response, next: Function) {
             if (req.session && req.session.logged === true)
                 return next();
             else{
-                res.sendStatus(401);
                 return self.SendResponse(res,'UNAUTHORIZED','You are not logged!');
             }
         };
@@ -158,7 +164,19 @@ class TAuthServer extends TObject {
 
         // define route to get user session
         user.get('/', auth, function (req: Request, res: Response){
-            return self.SendResponse(res,'LOGGED','You are not logged!');
+            return self.SendResponse(res,'LOGGED','You are logged!');
+        });
+
+        // define route to logout
+        user.get('/logout', auth, function (req: any, res: Response){
+            req.session.destroy();
+            return self.SendResponse(res,'LOGOUT','You are logged out!');
+        });
+
+        // define route to logout
+        user.get('/test', function (req: any, res: Response){
+            //return self.SendResponse(res,'LOGOUT','You are logged out!');
+            res.send('hello Test 7');
         });
     }
 }
