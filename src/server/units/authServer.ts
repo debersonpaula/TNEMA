@@ -135,7 +135,6 @@ class TAuthServer extends TObject {
     private InitRoutes(){
         const self = this;
         // define route to user registration
-        //let user = this.hServer.AddUseRouter('/user');
         let user = this.userAPI;
 
         // Authentication and Authorization Middleware
@@ -173,12 +172,6 @@ class TAuthServer extends TObject {
         user.get('/logout', auth, function (req: any, res: Response){
             req.session.destroy();
             return self.SendResponse(res,'LOGOUT','You are logged out!');
-        });
-
-        // define route to logout
-        user.get('/test', function (req: any, res: Response){
-            //return self.SendResponse(res,'LOGOUT','You are logged out!');
-            res.send('hello Test 3');
         });
     }
 }

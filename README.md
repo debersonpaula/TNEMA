@@ -1,11 +1,11 @@
 # TNEMA
 
-STILL ON WORKING...NOT FUNCTIONAL YET.
+STILL ON WORKING...NOT FULLY FUNCTIONAL YET.
 
 Server Bundle with: TypeScript + Node + Express + MongoDB + Authentication
 Requires TypeScript
 
-`npm install typescript --save-dev`
+`npm install typescript`
 
 ## Install
 
@@ -15,25 +15,12 @@ Requires TypeScript
 
 To start a server with static routing on './public':
 
-```
-const app = require('tnema');
-const server = app.createServer();
-
-server.httpServer.AddStatic('./public');
-server.httpServer.Listen();
-```
-
-To compile TypeScript based on config file:
-
-```
-const app = require('tnema');
-app.tools.compileTSC('config file');
-```
-
-
-To compile TypeScript based on config file and watch for any changes:
-
-```
-const app = require('tnema');
-app.tools.compileTSCW('config file','watch dir');
-```
+```js
+tnema = require('./index');
+server = new tnema.TNEMAServer;
+server.port(3000);
+server.mongoURI('mongodb://localhost/test');
+server.HttpServer.AddStatic(__dirname + '/public');
+server.Create(function(){
+    console.log('Server started at port: 3000');
+});

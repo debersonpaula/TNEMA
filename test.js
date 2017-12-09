@@ -4,7 +4,8 @@ const comp = require("tscbuilder");
 
 
 // declare vars
-var tnema = require('./lib/main');
+//var tnema = require('./lib/main');
+var tnema = require('./index');
 var server;
 
 // run first
@@ -21,14 +22,15 @@ function startServer(){
 
     /*---------------------------------------------*/
     logger.writelnR('!FgCyan','=== START SERVER ===');
-    tnema = require('./lib/main');
+    //tnema = require('./lib/main');
+    tnema = require('./index');
     server = new tnema.TNEMAServer;
     server.port(3000);
     server.mongoURI('mongodb://localhost/test');
     server.HttpServer.AddStatic(__dirname + '/test/public');
     
     /*---------------------------------------------*/
-    logger.writelnR('!FgCyan','=== CREATE APPLICATION ===');
+    logger.writelnR('!FgGreen','=== CREATE APPLICATION ===');
     server.Create(function(){
         logger.writelnR('!FgGreen','=== READY ===');
         runWatch();
@@ -56,7 +58,8 @@ function stopServer() {
 
         // clear cache of server component
         logger.writelnR('!FgBlue','Clear cache of server component');
-        decache('./lib/main');
+        //decache('./lib/main');
+        decache('./index');
         tnema = undefined;
         server = undefined;
 
@@ -64,7 +67,7 @@ function stopServer() {
         logger.writelnR('!FgCyan','\nRestarting server...');
         setTimeout(() => {
             startServer();    
-        }, 3000);
+        }, 500);
     });
 }
 /************************************************************/
