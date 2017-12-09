@@ -1,6 +1,7 @@
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="/auth.js"></script>
     </head>
 <body>
     <h4>Register your information below</h4>
@@ -22,11 +23,17 @@
         </div>
     </form>
 
+    <div id="registermsg"></div>
+    <div><a href="/">Home</a></div>
     
 
     <script>
+        DefineRegister('#formRegistration');
+        /*
         var form = $('#formRegistration');
 
+        
+        
         form.submit(function( event ) {
             var formData = form.serialize();
 
@@ -46,6 +53,7 @@
             event.stopPropagation();
             return false;
         });
+        */
     </script>
 </body>
 </html>

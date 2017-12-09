@@ -97,7 +97,7 @@ class TAuthServer extends TObject {
     }
 
     //Register User
-    private RegisterLogin(username: string, userpass: string, userpass2: string, res: Response): void {
+    private RegisterLogin(username: string, userpass: string, userpass2: string, res: Response, req: any): void {
         const self = this;
 
         if (!username || !userpass || userpass !== userpass2) {
@@ -113,7 +113,9 @@ class TAuthServer extends TObject {
                         // create user
                         getdata.Save({username: username, userpass: userpass}, function(result: any){
                             if (result) {
-                                self.SendResponse(res,'ACCEPTED','User registered.');
+                                console.log(result);
+                                self.CreateSession(req, username);
+                                self.SendResponse(res,'DONE');
                             }
                         });
                     }
@@ -149,7 +151,7 @@ class TAuthServer extends TObject {
                 req.body.username,
                 req.body.userpass,
                 req.body.userpass2,
-                res);
+                res, req);
         });
 
         // define route to log user
