@@ -106,20 +106,8 @@ class THttpServer extends TObject {
 
     // clear all routes
     private ClearRoutes(){
-        /*
-        for (var i = this.app.routes.get.length - 1; i >= 0; i--) {
-            this.app.routes.get.splice(i, 1);
-        }
-        */
-        var routes = this.app._router.stack;
-        /*
-        routes.forEach( function removeMiddlewares(route: any, i: number, routes: any){
-
-        } );
-        */
-        for (var i in routes){
-            routes.splice(0,1);
-        }
+        if (this.app._router.stack) this.app._router.stack = [];
+        this.app._router = undefined;
     }
 }
 // ===================================================

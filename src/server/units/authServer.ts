@@ -54,6 +54,8 @@ class TAuthServer extends TObject {
         const self = this;
         //self.userAPI
         //delete self.userAPI;
+        self.userAPI.delete('*');
+
         console.log(`Auth Server Stopped.`);
         self.DoDestroy(fn);
     }
@@ -176,7 +178,7 @@ class TAuthServer extends TObject {
         // define route to logout
         user.get('/test', function (req: any, res: Response){
             //return self.SendResponse(res,'LOGOUT','You are logged out!');
-            res.send('hello Test 7');
+            res.send('hello Test 3');
         });
     }
 }

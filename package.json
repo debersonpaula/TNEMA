@@ -1,6 +1,6 @@
 {
   "name": "tnema",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "TNEMA Server",
   "main": "index.js",
   "scripts": {
@@ -32,6 +32,7 @@
     "@types/express": "^4.0.39",
     "@types/express-session": "^1.15.6",
     "@types/mongoose": "^4.7.28",
+    "decache": "^4.3.0",
     "tscbuilder": "0.0.2",
     "typescript": "^2.6.2"
   },
