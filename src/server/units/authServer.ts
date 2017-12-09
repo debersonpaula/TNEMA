@@ -54,8 +54,7 @@ class TAuthServer extends TObject {
         const self = this;
         //self.userAPI
         //delete self.userAPI;
-        self.userAPI.delete('*');
-
+        //self.userAPI.delete('*');
         console.log(`Auth Server Stopped.`);
         self.DoDestroy(fn);
     }
@@ -70,15 +69,14 @@ class TAuthServer extends TObject {
     }
 
     //standard way to send response
-    private SendResponse(res: Response, code: string, msg: string): Response {
-        const resp = { code: code, msg: msg};
+    private SendResponse(res: Response, code: string, content?: any): Response {
+        const resp = { code: code, content: content};
         return res.json(resp);
     }
 
     //Login User
     private UserLogin(username: string, userpass: string, res: Response, req: any): void {
         const self = this;
-        //const getdata: TModel = this.db.SearchModel('dbUsers');
         if (username && userpass){
             const getdata: TModel = this.mServer.SearchModel('dbUsers');
             if (getdata) {
@@ -127,7 +125,6 @@ class TAuthServer extends TObject {
     //method to register user in session
     private CreateSession(req: any, username: string){
         req.session.username = username;
-        //req.session.userid = userdata._id;
         req.session.logged = true;
     }
 
@@ -142,7 +139,7 @@ class TAuthServer extends TObject {
             if (req.session && req.session.logged === true)
                 return next();
             else{
-                return self.SendResponse(res,'UNAUTHORIZED','You are not logged!');
+                return self.SendResponse(res,'');
             }
         };
 
@@ -165,7 +162,12 @@ class TAuthServer extends TObject {
 
         // define route to get user session
         user.get('/', auth, function (req: Request, res: Response){
-            return self.SendResponse(res,'LOGGED','You are logged!');
+            const session: any = req.session;
+            const content = {
+                username: session.username
+            };
+            //console.log(session);
+            return self.SendResponse(res,'SESSION',content);
         });
 
         // define route to logout

@@ -1,19 +1,25 @@
 /*---------------------------------------------------*/
-
+function GetTNEMAContent(method, url, success){
+    var sendAjax = $.ajax({
+        type : method,
+        url  : url,
+    });
+    sendAjax.done(function(data){
+        if (success) {
+            console.log('code = ' + data.code);
+            console.log(data.content);
+            success(data.code, data.content);
+        }
+    });
+}
+/*---------------------------------------------------*/
 function CheckSession(elementID){
 
     var panel = $(elementID);
 
-    var sendAjax = $.ajax({
-        type : 'GET',
-        url  : '/user',
-    });
-
-    sendAjax.done(function(data){
-        console.log(data);
-
-        if (data.code == 'LOGGED'){
-            panel.html('Logged | <button id="logout">Logout</button>');
+    GetTNEMAContent('GET','/user',function(code,content){
+        if (code == 'SESSION'){
+            panel.html('Hello ' + content.username + ' | <button id="logout">Logout</button>');
             $('#logout').click(function(){
                 console.log('Action = Logout');
                 $.ajax({type:'GET', url:'/user/logout'}).done(function(data){
@@ -25,7 +31,6 @@ function CheckSession(elementID){
             panel.html('<a href="/register.html">Register</a> | <a href="/login.html">LogIn</a>');
         }
     });
-
 }
 
 function DefineFormLogin(elementID){
