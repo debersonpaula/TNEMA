@@ -13,7 +13,39 @@ import * as mongoose from 'mongoose';
 
 // ===================================================
 // === classes =======================================
-class TMongoServer extends TObject {
+export class TModel {
+    // components
+    public Name: string;
+    public Schema: mongoose.Schema;
+    public Model: mongoose.Model<any>;
+    // method to find
+    public Find(conditions: Object, callback?: (result: any[]) => void ) {
+        const self = this;
+        self.Model.find(conditions, function(err: any, res: any[]){ self.ResultOperation(err, res, callback); });
+    }
+    // method to save
+    public Save(data: Object, callback?: (result: any[]) => void ) {
+        const self = this,
+            savemodel: mongoose.Document = new self.Model(data);
+        savemodel.save(function(err: any, res: any){ self.ResultOperation(err, res, callback); });
+    }
+    // method to return result of mongoose operation
+    private ResultOperation(err: any, res: any, callback?: Function) {
+        let result = false;
+        if (err) {
+            console.log(err);
+        }else {
+            result = res;
+        }
+        // callback && callback(result);
+        if (callback) {
+            callback(result);
+        }
+    }
+}
+// ===================================================
+// ===================================================
+export class TMongoServer extends TObject {
     // components
     private models: Array<TModel>;
     private mongoApp: mongoose.Mongoose;
@@ -77,37 +109,3 @@ class TMongoServer extends TObject {
         return result;
     }
 }
-
-class TModel {
-    // components
-    public Name: string;
-    public Schema: mongoose.Schema;
-    public Model: mongoose.Model<any>;
-    // method to find
-    public Find(conditions: Object, callback?: (result: any[]) => void ) {
-        const self = this;
-        self.Model.find(conditions, function(err: any, res: any[]){ self.ResultOperation(err, res, callback); });
-    }
-    // method to save
-    public Save(data: Object, callback?: (result: any[]) => void ) {
-        const self = this,
-            savemodel: mongoose.Document = new self.Model(data);
-        savemodel.save(function(err: any, res: any){ self.ResultOperation(err, res, callback); });
-    }
-    // method to return result of mongoose operation
-    private ResultOperation(err: any, res: any, callback?: Function) {
-        let result = false;
-        if (err) {
-            console.log(err);
-        }else {
-            result = res;
-        }
-        // callback && callback(result);
-        if (callback) {
-            callback(result);
-        }
-    }
-}
-// ===================================================
-// === exports =======================================
-export { TMongoServer, TModel };
