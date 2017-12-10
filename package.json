@@ -25,6 +25,7 @@
     "express-session": "^1.15.6",
     "mongoose": "^4.13.6",
     "node-watch": "^0.5.5",
+    "session-file-store": "^1.2.0",
     "tobjectlist": "0.0.3"
   },
   "devDependencies": {

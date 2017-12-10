@@ -4,8 +4,7 @@ const comp = require("tscbuilder");
 
 
 // declare vars
-//var tnema = require('./lib/main');
-var tnema = require('./index');
+var tnema;
 var server;
 
 // run first
@@ -24,9 +23,10 @@ function startServer(){
     logger.writelnR('!FgCyan','=== START SERVER ===');
     //tnema = require('./lib/main');
     tnema = require('./index');
-    server = new tnema.TNEMAServer;
+    server = new tnema.TNEMAServer('appTest','A123-Csd1-Apow');
     server.port(3000);
     server.mongoURI('mongodb://localhost/test');
+    server.AuthServer.SessionName = 'test-ssession';
     server.HttpServer.AddStatic(__dirname + '/test/public');
     
     /*---------------------------------------------*/

@@ -14,8 +14,10 @@ import { THttpServer } from './httpServer';
 import { TModel, TMongoServer } from './mongoServer';
 
 import { Request, Response } from 'express';
+import * as express from 'express';
 import * as session from 'express-session';
 import { Router } from 'express-serve-static-core';
+import { RequestHandler } from '_debugger';
 
 // ===================================================
 // === classes =======================================
@@ -24,15 +26,20 @@ class TAuthServer extends TObject {
     private hServer: THttpServer;
     private mServer: TMongoServer;
     private userAPI: Router;
+    private sessionHandler: express.RequestHandler;    
     
     // constructor
-    constructor(HttpServer: THttpServer, MongoServer: TMongoServer) {
+    constructor(HttpServer: THttpServer, MongoServer: TMongoServer, SessionID: string, SecretID: string) {
         super();
         this.hServer = HttpServer;
         this.mServer = MongoServer;
+        //create store for session
+        let FileStore = require('session-file-store')(session);
         //start session
         HttpServer.AddMiddleware(session({
-            secret: 'Was8-df90-poqw',
+            store: new FileStore,
+            secret: SecretID,
+            name: SessionID,
             resave: true,
             saveUninitialized: true
         }));
@@ -44,7 +51,9 @@ class TAuthServer extends TObject {
     public Create(fn?: Function) {
         const self = this;
         console.log(`Auth Server Started.`);
+        // get standard db models
         this.InitStandardModels();
+        // start routes
         this.InitRoutes();
         self.DoCreate(fn);
     }
@@ -52,9 +61,6 @@ class TAuthServer extends TObject {
     // stop server
     public Destroy(fn?: Function) {
         const self = this;
-        //self.userAPI
-        //delete self.userAPI;
-        //self.userAPI.delete('*');
         console.log(`Auth Server Stopped.`);
         self.DoDestroy(fn);
     }

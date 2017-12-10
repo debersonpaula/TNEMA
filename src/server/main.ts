@@ -21,12 +21,12 @@ class TNEMAServer extends TObjectList{
     public MongoServer: TMongoServer;
     public AuthServer: TAuthServer;
     
-    constructor() {
+    constructor(SessionID: string, SecretID: string) {
         super();
         // initialize servers
         this.HttpServer = new THttpServer;
         this.MongoServer = new TMongoServer;
-        this.AuthServer = new TAuthServer( this.HttpServer, this.MongoServer );
+        this.AuthServer = new TAuthServer( this.HttpServer, this.MongoServer, SessionID, SecretID );
         //add to object list
         this.AddObject(this.HttpServer);
         this.AddObject(this.MongoServer);
