@@ -5,7 +5,8 @@ declare class TAuthServer extends TObject {
     private hServer;
     private mServer;
     private userAPI;
-    constructor(HttpServer: THttpServer, MongoServer: TMongoServer);
+    private sessionHandler;
+    constructor(HttpServer: THttpServer, MongoServer: TMongoServer, SessionID: string, SecretID: string);
     Create(fn?: Function): void;
     Destroy(fn?: Function): void;
     private InitStandardModels();
