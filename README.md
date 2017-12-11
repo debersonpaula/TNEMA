@@ -18,9 +18,6 @@ npm install typescript
 
 # also requires @types
 npm install @types/body-parser @types/express @types/express-session @types/mongoose
- 
-# install TNEMA Server
-npm install tnema --save
 ```
 
 Also requires an instance of MongoDB running.
@@ -37,7 +34,7 @@ npm install tnema --save
 To start a server with static routing on './public':
 
 ```js
-  tnema = require('./index');
+  tnema = require('tnema');
   server = new tnema.TNEMAServer;
   
   // define port
