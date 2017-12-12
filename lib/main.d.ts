@@ -7,7 +7,7 @@ declare class TNEMAServer extends TObjectList {
     MongoServer: TMongoServer;
     AuthServer: TAuthServer;
     constructor(SessionID: string, SecretID: string);
-    port(port?: number): number;
-    mongoURI(uri?: string): string;
+    Port(port?: number): number;
+    MongoSource(uri?: string): string;
 }
 export { TNEMAServer };

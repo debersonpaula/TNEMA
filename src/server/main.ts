@@ -20,13 +20,14 @@ class TNEMAServer extends TObjectList{
     public HttpServer: THttpServer;
     public MongoServer: TMongoServer;
     public AuthServer: TAuthServer;
-    
+
     constructor(SessionID: string, SecretID: string) {
         super();
         // initialize servers
         this.HttpServer = new THttpServer;
         this.MongoServer = new TMongoServer;
         this.AuthServer = new TAuthServer( this.HttpServer, this.MongoServer, SessionID, SecretID );
+
         //add to object list
         this.AddObject(this.HttpServer);
         this.AddObject(this.MongoServer);
@@ -36,7 +37,7 @@ class TNEMAServer extends TObjectList{
     // FORWARDERS
 
     // set or get http port
-    public port(port?: number): number {
+    public Port(port?: number): number {
         if (port){
             this.HttpServer.httpPort = port;   
         }
@@ -44,7 +45,7 @@ class TNEMAServer extends TObjectList{
     }
 
     // set or get mongo uri
-    public mongoURI(uri?: string): string {
+    public MongoSource(uri?: string): string {
         if (uri){
             this.MongoServer.mongoURI = uri;   
         }

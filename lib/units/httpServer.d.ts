@@ -11,11 +11,12 @@ declare class THttpServer extends TObject {
     constructor();
     Create(fn?: Function): void;
     Destroy(fn?: Function): void;
-    AddStatic(path: string): void;
-    AddRouteToFile(uri: string, filename: string): void;
-    AddRouter(uri: string): express.IRoute;
-    AddUse(uri: string, handler: any): void;
-    AddUseRouter(uri: string): express.Router;
+    Route(uri: string): express.IRoute;
+    RouteStatic(path: string): void;
+    RouteSendFile(uri: string, filename: string): void;
+    RouteSendContent(uri: string, content: any): void;
+    Use(uri: string, handler: any): void;
+    UseRouter(uri: string): express.Router;
     AddMiddleware(handler: express.RequestHandler): void;
     private ClearRoutes();
 }

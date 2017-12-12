@@ -70,30 +70,37 @@ class THttpServer extends TObject {
         });
     }
 
+    // add router handler
+    public Route(uri: string): express.IRoute {
+        return this.app.route(uri);
+    }
+
     // add static route
-    public AddStatic(path: string) {
+    public RouteStatic(path: string) {
         this.app.use(express.static(path));
     }
 
     // add route to specific file
-    public AddRouteToFile(uri: string, filename: string) {
+    public RouteSendFile(uri: string, filename: string) {
         this.app.get(uri, function(req, res){
             res.sendFile(filename);
         });
     }
 
-    // add router handler
-    public AddRouter(uri: string): express.IRoute {
-        return this.app.route(uri);
+    // add route to any content
+    public RouteSendContent(uri: string, content: any) {
+        this.app.get(uri, function(req, res){
+            res.send(content);
+        });
     }
 
     // add router use direct to handler
-    public AddUse(uri: string,  handler: any): void {
+    public Use(uri: string,  handler: any): void {
         this.app.use(uri, handler);
     }
 
     // add router use Router handler
-    public AddUseRouter(uri: string): express.Router {
+    public UseRouter(uri: string): express.Router {
         const router: express.Router = express.Router();
         this.app.use(uri, router);
         return router;

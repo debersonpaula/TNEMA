@@ -44,7 +44,7 @@ class TAuthServer extends TObject {
             saveUninitialized: true
         }));
         //get user api
-        this.userAPI = this.hServer.AddUseRouter('/user');
+        this.userAPI = this.hServer.UseRouter('/user');
     }
 
     // start server

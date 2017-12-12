@@ -35,16 +35,21 @@ To start a server with static routing on './public':
 
 ```js
   tnema = require('tnema');
-  server = new tnema.TNEMAServer;
+  
+  // create server instance with session-name and secret-string
+  server = new tnema.TNEMAServer('session-name','secret-string');
   
   // define port
-  server.port(3000);
+  server.Port(3000);
   
   // define the source of mongodb
-  server.mongoURI('mongodb://localhost/test');
+  server.MongoSource('mongodb://localhost/test');
   
   // add static route to public folder
-  server.HttpServer.AddStatic(__dirname + '/public');
+  server.HttpServer.RouteStatic(__dirname + '/public');
+
+  // add route to /test and send the content
+    server.HttpServer.RouteSendContent('/test','Test Sucessfully');
   
   // start server
   server.Create(function(){

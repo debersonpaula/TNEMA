@@ -21,13 +21,20 @@ function startServer(){
 
     /*---------------------------------------------*/
     logger.writelnR('!FgCyan','=== START SERVER ===');
-    //tnema = require('./lib/main');
     tnema = require('./index');
     server = new tnema.TNEMAServer('appTest','A123-Csd1-Apow');
-    server.port(3000);
-    server.mongoURI('mongodb://localhost/test');
-    server.AuthServer.SessionName = 'test-ssession';
-    server.HttpServer.AddStatic(__dirname + '/test/public');
+
+    // define port
+    server.Port(3000);
+
+    // define the source of mongodb
+    server.MongoSource('mongodb://localhost/test');
+
+    // add static route to public folder
+    server.HttpServer.RouteStatic(__dirname + '/test/public');
+
+    // add route to /test and send the content
+    server.HttpServer.RouteSendContent('/test','Test Sucessfully');
     
     /*---------------------------------------------*/
     logger.writelnR('!FgGreen','=== CREATE APPLICATION ===');
@@ -58,7 +65,6 @@ function stopServer() {
 
         // clear cache of server component
         logger.writelnR('!FgBlue','Clear cache of server component');
-        //decache('./lib/main');
         decache('./index');
         tnema = undefined;
         server = undefined;
