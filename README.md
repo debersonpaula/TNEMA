@@ -2,6 +2,8 @@
 
 Server Bundle with: TypeScript + Node + Express + MongoDB + Authentication
 
+[![NPM](https://nodei.co/npm/tnema.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/tnema)
+
 Work Progress:
 
  - Core functionalities: done
@@ -56,3 +58,7 @@ To start a server with static routing on './public':
     console.log('Server started at port: 3000');
   });
 ```
+
+## License
+
+  [MIT](LICENSE)
