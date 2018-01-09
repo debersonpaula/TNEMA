@@ -1,19 +1,23 @@
+'use strict';
 /*---------------------------------------------------*/
-function GetTNEMAContent(method, url, cbSuccess){
+function SetAjaxHandler(ajax, cb){
+    ajax.done(function(data){
+        cb && cb(data);
+    });
+    ajax.fail(function(data){
+        cb && cb(data.responseJSON);
+    });
+}
+/*---------------------------------------------------*/
+function GetTNEMAContent(method, url, cb){
     var sendAjax = $.ajax({
         type : method,
         url  : url,
     });
-    sendAjax.done(function(data){
-        if (cbSuccess) {
-            console.log(method + ' code = ' + data.code);
-            console.log(data.content);
-            cbSuccess(data.code, data.content);
-        }
-    });
+    SetAjaxHandler(sendAjax, cb);
 }
 /*---------------------------------------------------*/
-function SetTNEMAContent(method, url, sendData, cbSuccess){
+function SetTNEMAContent(method, url, sendData, cb){
     var sendAjax = $.ajax({
         type : method,
         url  : url,
@@ -21,24 +25,16 @@ function SetTNEMAContent(method, url, sendData, cbSuccess){
         dataType : 'json',
         encode : true
     });
-    sendAjax.done(function(data){
-        if (cbSuccess) {
-            console.log(method + ' code = ' + data.code);
-            console.log(data.content);
-            cbSuccess(data.code, data.content);
-        }
-    });
+    SetAjaxHandler(sendAjax, cb);
 }
 /*---------------------------------------------------*/
 function CheckSession(elementID){
     var panel = $(elementID);
-    GetTNEMAContent('GET','/user',function(code,content){
-        if (code == 'SESSION'){
-            panel.html('Hello ' + content.username + ' | <button id="logout">Logout</button>');
+    GetTNEMAContent('GET','/user',function(res){
+        if (res.status == 200) {
+            panel.html('Hello ' + res.messages[0].username + ' | <button id="logout">Logout</button>');
             $('#logout').click(function(){
-                console.log('Action = Logout');
                 $.ajax({type:'GET', url:'/user/logout'}).done(function(data){
-                    console.log(data);
                     window.location.replace('/');
                 });
             });
@@ -52,11 +48,11 @@ function DefineRegister(elementID){
     var form = $(elementID);
     form.submit(function( event ) {
         var formData = form.serialize();
-        SetTNEMAContent('POST','/user',formData,function(code,content){
-            if (code == 'DONE'){
+        SetTNEMAContent('POST','/user',formData,function(res){
+            if (res.status == 200) {
                 window.location.replace('/');
             } else {
-                $('#registermsg').html(content);
+                $('#registermsg').html(res.messages.toString());
             }
         });
         event.preventDefault();
@@ -68,24 +64,13 @@ function DefineFormLogin(elementID){
     
     form.submit(function( event ) {
         var formData = form.serialize();
-
-        var sendAjax = $.ajax({
-            type : 'POST',
-            url  : '/user/login',
-            data : formData,
-            dataType : 'json',
-            encode : true
-        });
-
-        sendAjax.done(function(data){
-            console.log(data);
-            if (data.code == 'ACCEPTED'){
+        SetTNEMAContent('POST','/user/login',formData,function(res){
+            if (res.status == 200) {
                 window.location.replace('/');
             } else {
-                $('#loginmsg').html(data.code + ': ' + data.msg);
+                $('#loginmsg').html(res.messages.toString());
             }
         });
-
         event.preventDefault();
     });
 }

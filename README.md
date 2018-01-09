@@ -8,7 +8,7 @@ Work Progress:
 
  - Core functionalities: done
  - Http Server: done
- - MongoDB Server: done
+ - MongoDB Server: remake
  - Authentication Server: done
  - Security: working
 

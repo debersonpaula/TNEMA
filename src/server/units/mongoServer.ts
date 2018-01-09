@@ -6,102 +6,166 @@
 * https://github.com/debersonpaula
 */
 
-// ===================================================
-// === imports =======================================
+// =========================================================================
+// === imports =============================================================
+// =========================================================================
 import { TObject } from 'tobjectlist';
-import * as mongoose from 'mongoose';
+import { Schema, SchemaDefinition, Model, Connection, Document, Mongoose } from 'mongoose';
+import * as errcatcher from './errcatcher';
+// =========================================================================
+// === classes =============================================================
+// =========================================================================
+export class TSchema {
 
-// ===================================================
-// === classes =======================================
-export class TModel {
-    // components
-    public Name: string;
-    public Schema: mongoose.Schema;
-    public Model: mongoose.Model<any>;
-    // method to find
-    public Find(conditions: Object, callback?: (result: any[]) => void ) {
-        const self = this;
-        self.Model.find(conditions, function(err: any, res: any[]){ self.ResultOperation(err, res, callback); });
+    /** Name of Schema and of the Document */
+    private _name: string;
+
+    /** Mongoose Schema object */
+    private _schema: Schema;
+
+    /** TSchema Constructor */
+    constructor(name: string, definition?: SchemaDefinition){
+        this._name = name;
+        this._schema = new Schema(definition);
     }
-    // method to save
-    public Save(data: Object, callback?: (result: any[]) => void ) {
-        const self = this,
-            savemodel: mongoose.Document = new self.Model(data);
-        savemodel.save(function(err: any, res: any){ self.ResultOperation(err, res, callback); });
+
+    /** Public Methods */
+    get name(): string {
+        return this._name;
     }
-    // method to return result of mongoose operation
-    private ResultOperation(err: any, res: any, callback?: Function) {
-        let result = false;
-        if (err) {
-            console.log(err);
-        }else {
-            result = res;
-        }
-        // callback && callback(result);
-        if (callback) {
-            callback(result);
-        }
+
+    get schema(): Schema {
+        return this._schema;
     }
 }
-// ===================================================
-// ===================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+export class TModel {
+    // components
+    private _model: Model<any>;
+
+    /** TModel Constructor */
+    constructor(App: Connection, ModelSchema: TSchema){
+        this._model = App.model(ModelSchema.name, ModelSchema.schema);
+        this._model.ensureIndexes();
+    }
+
+    /** Get Name of the Model */
+    get name() {
+        return this._model.modelName;
+    }
+
+    /** Find Document in collection based on conditions */
+    public find(where: Object, callback?: (res: Document[], err: any) => void ) {
+        this._model.find(where, (findErr: any, findRes: Document[]) => {
+            callback && callback(findRes, findErr);
+        });
+    }
+
+    /** Save Document and return callback */
+    private save(doc: Document, callback?: (res: Object, err: string[]) => void) {
+        doc.save().then(
+            // onfullfiled
+            (value: any) => {
+                callback && callback(value, []);
+            },
+            // onrejected
+            (reason: any) => {
+                callback && callback(doc, errcatcher.ShowErrors(reason, this._model));
+            }
+        );
+    }
+
+    /** Insert Document */
+    public insert(data: Object, callback?: (res: Object, err: string[]) => void) {
+        this.save(new this._model(data), callback);
+    }
+
+    /** Update Documents based on where */
+    public update(data: Object, where: Object, callback?: (res: Object, err: string[]) => void) {
+        this._model.find(where, (err: any, res: Document[]) => {
+            for (const i in res) {
+                res[i].set(data);
+                this.save(res[i], callback);
+            }
+        });
+    }
+
+    /** Update Document based on ID */
+    public updateById(data: Object, id: string, callback?: (res: Object, err: string[]) => void) {
+        this._model.findById(id, (err: any, res: Document) => {
+            res.set(data);
+            this.save(res, callback);
+        });
+    }
+
+    /** Delete Document based on where */
+    public delete(where: Object, callback?: (err: any) => void) {
+        this._model.remove(where, (err) => {
+            if (err) {
+                callback && callback(err);
+            }
+        });
+    }
+}
+// =========================================================================
+// =========================================================================
+// =========================================================================
 export class TMongoServer extends TObject {
     // components
     private models: Array<TModel>;
-    private mongoApp: mongoose.Mongoose;
+    private mongoApp: Mongoose;
 
-    // properties
-    public mongoURI: string;
+    /** MongoDB adress */
+    public mongoURL: string;
     
-    // constructor
+    /** TMongoServer Constructor */
     constructor() {
         super();
         this.models = [];
-        this.mongoApp = new mongoose.Mongoose;
+        this.mongoApp = new Mongoose;
+        this.mongoApp.Promise = global.Promise;
     }
 
-    // start server
+    /** Start Server Connection */
     public Create(fn?: Function) {
         const self = this;
-        const dbURI: string = this.mongoURI;
+        const dbURI: string = this.mongoURL;
         if (dbURI) {
-            this.mongoApp.connection.on('connected', function(){ console.log('Connected to MongoDB, URL = ' + dbURI); });
-            this.mongoApp.connection.on('error', function(err: any){ console.log('Not connected to MongoDB => Error: ' + err); });
-            this.mongoApp.connection.on('disconnected', function(){ console.log('Disconnected to MongoDB, URL = '  + dbURI); });
-            this.mongoApp.connection.on('open', function(){ console.log('Connection with MongoDB is open.'); });
             this.mongoApp.connect(dbURI, {useMongoClient: true}, function(){
-                console.log(`Mongo Server Started.`);
                 self.DoCreate(fn);
             });
         }
     }
 
-    // stop server
+    /** Set Events to connection */
+    public On(event: string, cb: any){
+        this.mongoApp.connection.on(event, cb);
+    }
+
+    /** Destroy Server Connection */
     public Destroy(fn?: Function) {
         const self = this;
         // close server connection
         this.mongoApp.disconnect(function(){
-            console.log(`Mongo Server Stopped.`);
             delete self.models;
             self.models = [];
             self.DoDestroy(fn);
         });
     }
 
-    // add mongoose model
-    AddModel(Schema: mongoose.SchemaDefinition, ModelName: string) {
-        const content = new TModel();
-        content.Name = ModelName;
-        content.Schema = new mongoose.Schema(Schema);
-        content.Model = this.mongoApp.model(ModelName, content.Schema);
-        this.models.push(content);
+    /** Add Schema and Create Model in the Server model list */
+    AddModel(Schema: TSchema) {
+        const model = new TModel(this.mongoApp.connection, Schema);
+        this.models.push(model);
     }
 
     // search model by name
     SearchModel(ModelName: string): TModel {
         let result: any;
         for (const i in this.models) {
-            if (this.models[i].Name === ModelName) {
+            if (this.models[i].name === ModelName) {
                 result = this.models[i];
                 break;
             }
@@ -109,3 +173,6 @@ export class TMongoServer extends TObject {
         return result;
     }
 }
+// =========================================================================
+// =========================================================================
+// =========================================================================

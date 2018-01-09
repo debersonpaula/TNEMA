@@ -9,7 +9,6 @@
 
 // ===================================================
 // === imports =======================================
-//import { TObjectList } from './units/tobjectlist';
 import { TObjectList } from 'tobjectlist';
 import { THttpServer } from './units/httpServer';
 import { TMongoServer } from './units/mongoServer';
@@ -17,39 +16,42 @@ import { TAuthServer } from './units/authServer';
 // ===================================================
 // === classes =======================================
 class TNEMAServer extends TObjectList{
-    public HttpServer: THttpServer;
-    public MongoServer: TMongoServer;
-    public AuthServer: TAuthServer;
+    private _HttpServer: THttpServer;
+    private _MongoServer: TMongoServer;
+    private _AuthServer: TAuthServer;
 
     constructor(SessionID: string, SecretID: string) {
         super();
         // initialize servers
-        this.HttpServer = new THttpServer;
-        this.MongoServer = new TMongoServer;
-        this.AuthServer = new TAuthServer( this.HttpServer, this.MongoServer, SessionID, SecretID );
+        this._HttpServer = new THttpServer;
+        this._MongoServer = new TMongoServer;
+        this._AuthServer = new TAuthServer( this._HttpServer, this._MongoServer, SessionID, SecretID );
 
         //add to object list
-        this.AddObject(this.HttpServer);
-        this.AddObject(this.MongoServer);
-        this.AddObject(this.AuthServer);
+        this.AddObject(this._HttpServer);
+        this.AddObject(this._MongoServer);
+        this.AddObject(this._AuthServer);
     }
 
     // FORWARDERS
+    get HttpServer(): THttpServer { return this._HttpServer }
+    get MongoServer(): TMongoServer { return this._MongoServer };
+    get AuthServer(): TAuthServer { return this._AuthServer };
 
     // set or get http port
-    public Port(port?: number): number {
-        if (port){
-            this.HttpServer.httpPort = port;   
-        }
-        return this.HttpServer.httpPort;
+    get Port(): number {
+        return this._HttpServer.httpPort;
+    }
+    set Port(port: number) {
+        this._HttpServer.httpPort = port;
     }
 
     // set or get mongo uri
-    public MongoSource(uri?: string): string {
-        if (uri){
-            this.MongoServer.mongoURI = uri;   
-        }
-        return this.MongoServer.mongoURI;
+    get MongoSource(): string {
+        return this._MongoServer.mongoURL;
+    }
+    set MongoSource(url: string) {
+        this._MongoServer.mongoURL = url;
     }
 }
 // ===================================================

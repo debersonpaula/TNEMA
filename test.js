@@ -25,10 +25,10 @@ function startServer(){
     server = new tnema.TNEMAServer('appTest','A123-Csd1-Apow');
 
     // define port
-    server.Port(3000);
+    server.Port = 3000;
 
     // define the source of mongodb
-    server.MongoSource('mongodb://localhost/test');
+    server.MongoSource = 'mongodb://localhost/test';
 
     // add static route to public folder
     server.HttpServer.RouteStatic(__dirname + '/test/public');

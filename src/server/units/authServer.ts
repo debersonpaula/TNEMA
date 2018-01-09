@@ -11,7 +11,7 @@
 // === imports =======================================
 import { TObject } from 'tobjectlist';
 import { THttpServer } from './httpServer';
-import { TModel, TMongoServer } from './mongoServer';
+import { TSchema, TModel, TMongoServer } from './mongoServer';
 
 import { Request, Response } from 'express';
 import * as express from 'express';
@@ -49,81 +49,65 @@ class TAuthServer extends TObject {
 
     // start server
     public Create(fn?: Function) {
-        const self = this;
-        console.log(`Auth Server Started.`);
         // get standard db models
         this.InitStandardModels();
         // start routes
         this.InitRoutes();
-        self.DoCreate(fn);
+        this.DoCreate(fn);
     }
 
     // stop server
     public Destroy(fn?: Function) {
-        const self = this;
-        console.log(`Auth Server Stopped.`);
-        self.DoDestroy(fn);
+        this.DoDestroy(fn);
     }
 
     // get all models from DefAStandard
     private InitStandardModels(){
         if (this.mServer){
-            DefAStandard.StandardModels.forEach(model => {
-                this.mServer.AddModel(model.Schema, model.Name);
+            DefAStandard.StandardModels.forEach(modelSchema => {
+                this.mServer.AddModel(modelSchema);
             });
         }
     }
 
-    //standard way to send response
-    private SendResponse(res: Response, code: string, content?: any): Response {
-        const resp = { code: code, content: content};
-        return res.json(resp);
-    }
-
     //Login User
     private UserLogin(username: string, userpass: string, res: Response, req: any): void {
-        const self = this;
+        // const self = this;
         if (username && userpass){
             const getdata: TModel = this.mServer.SearchModel('dbUsers');
             if (getdata) {
                 // locate if the user and pass matches
-                getdata.Find({username: username, userpass: userpass},function(result){
+                getdata.find({username: username, userpass: userpass}, (result) => {
                     // if result > 0, user found
                     if (result.length){
-                        self.CreateSession(req, username);
-                        self.SendResponse(res,'ACCEPTED','User logged.');
+                        this.CreateSession(req, username);
+                        sendjson(res, 200, []);
                     } else {
-                        self.SendResponse(res,'INVALID','User and Password not match.');
+                        sendjson(res, 403, ['User and Password not match.']);
                     }
                 });
             }
         } else {
-            this.SendResponse(res,'INVALID','User Name and Password fields cant be blank.');
+            sendjson(res, 403, ['User Name and Password fields cant be blank.']);
         }
     }
 
     //Register User
-    private RegisterLogin(username: string, userpass: string, userpass2: string, res: Response, req: any): void {
-        const self = this;
+    private RegisterLogin(username: string, userpass: string, userpass2: string,
+                          res: Response, req: any): void {
 
         if (!username || !userpass || userpass !== userpass2) {
-            self.SendResponse(res,'INVALID','User Name and Password fields cant be blank and Passwords should be the same.');
+            sendjson(res, 403, ['User Name and Password fields cant be blank '+
+                    'and Passwords should be the same.']);
         } else {
-            const getdata: TModel = self.mServer.SearchModel('dbUsers');
-            if (getdata) {
-                // locate if the user exists
-                getdata.Find({username: username},function(result){
-                    if (result.length){
-                        self.SendResponse(res,'INVALID','This user already exists.');
-                    }else {
-                        // create user
-                        getdata.Save({username: username, userpass: userpass}, function(result: any){
-                            if (result) {
-                                console.log(result);
-                                self.CreateSession(req, username);
-                                self.SendResponse(res,'DONE');
-                            }
-                        });
+            const model: TModel = this.mServer.SearchModel('dbUsers');
+            if (model) {
+                model.insert({username: username, userpass: userpass}, (result: any, err: any) => {
+                    if (err.length) {
+                        sendjson(res, 403, err);
+                    } else {
+                        this.CreateSession(req, username);
+                        sendjson(res, 200, []);
                     }
                 });
             }
@@ -147,7 +131,7 @@ class TAuthServer extends TObject {
             if (req.session && req.session.logged === true)
                 return next();
             else{
-                return self.SendResponse(res,'');
+                sendjson(res, 401, ['Not authorized.']);
             }
         };
 
@@ -175,28 +159,44 @@ class TAuthServer extends TObject {
                 username: session.username
             };
             //console.log(session);
-            return self.SendResponse(res,'SESSION',content);
+            sendjson(res, 200, [{username: session.username}] );
         });
 
         // define route to logout
         user.get('/logout', auth, function (req: any, res: Response){
             req.session.destroy();
-            return self.SendResponse(res,'LOGOUT','You are logged out!');
+            sendjson(res, 200, []);
         });
     }
 }
 // ===================================================
+// === general methods ===============================
+// ===================================================
+function sendjson(res: Response, status: number, msg: any[]) {
+    res.status(status).json({
+        messages: msg,
+        status: status
+    });
+}
+// ===================================================
 // === exports =======================================
+// ===================================================
 export { TAuthServer };
 
 export let DefAStandard = {
     StandardModels: [
-        {
-            Name: 'dbUsers',
-            Schema: {
-                username: {type: String, default: ''},
-                userpass: {type: String, default: ''}
+        new TSchema('dbUsers',{
+            username: {
+                type: String,
+                default: '',
+                required: [true,'UserName is required'],
+                unique: [true,'This UserName already exists']
+            },
+            userpass: {
+                type: String,
+                default: '',
+                required: [true,'Password is required'],
             }
-        }
+        })
     ]
 };

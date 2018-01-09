@@ -38,7 +38,7 @@ class THttpServer extends TObject {
         let ListenPort = 3000;
         const self = this;
         if (!this.httpPort) {
-            console.log('HTTP Port was not been assigned to options');
+            throw 'HTTP Port was not been assigned to options';
         }else {
             ListenPort = this.httpPort || ListenPort;
             // enable destroy
@@ -65,7 +65,6 @@ class THttpServer extends TObject {
         let server: any = this.server;
         // force all connections to disconnect
         server.destroy(function(){
-            console.log(`HTTP Server Stopped.`);
             self.DoDestroy(fn);
         });
     }
