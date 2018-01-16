@@ -7,7 +7,7 @@
 * https://github.com/debersonpaula
 *
 *
-* V.0.3.0
+* V.0.3.3
 */
 
 // ===================================================
@@ -15,23 +15,22 @@
 import { TObject } from 'tobjectlist';
 import { THttpServer } from './httpServer';
 import { TSchema, TModel, TMongoServer } from './mongoServer';
-import { Request, Response } from 'express';
-import { Router, RequestHandler } from 'express-serve-static-core';
+import { Request, Response, Router, RequestHandler, NextFunction } from 'express';
 import { TSessionApp } from './sessionHandler';
 
 // ===================================================
 // === classes =======================================
 class TAuthServer extends TObject {
     // components
-    private hServer: THttpServer;
-    private mServer: TMongoServer;
+    private _HttpServer: THttpServer;
+    private _MongoServer: TMongoServer;
     private _session: TSessionApp;
     
     // constructor
     constructor(HttpServer: THttpServer, MongoServer: TMongoServer, SessionID: string, SessionFile: string) {
         super();
-        this.hServer = HttpServer;
-        this.mServer = MongoServer;
+        this._HttpServer = HttpServer;
+        this._MongoServer = MongoServer;
         //create store for session
         this._session = new TSessionApp({appName: SessionID, filename: SessionFile});
     }
@@ -52,9 +51,9 @@ class TAuthServer extends TObject {
 
     // get all models from DefAStandard
     private InitStandardModels(){
-        if (this.mServer){
+        if (this._MongoServer){
             DefAStandard.StandardModels.forEach(modelSchema => {
-                this.mServer.AddModel(modelSchema);
+                this._MongoServer.AddModel(modelSchema);
             });
         }
     }
@@ -63,7 +62,7 @@ class TAuthServer extends TObject {
     private UserLogin(username: string, userpass: string, res: Response, req: any): void {
         // const self = this;
         if (username && userpass){
-            const getdata: TModel = this.mServer.SearchModel('dbUsers');
+            const getdata: TModel = this._MongoServer.SearchModel('dbUsers');
             if (getdata) {
                 // locate if the user and pass matches
                 getdata.find({username: username, userpass: userpass}, (result) => {
@@ -89,7 +88,7 @@ class TAuthServer extends TObject {
             sendjson(res, 403, ['User Name and Password fields cant be blank '+
                     'and Passwords should be the same.']);
         } else {
-            const model: TModel = this.mServer.SearchModel('dbUsers');
+            const model: TModel = this._MongoServer.SearchModel('dbUsers');
             if (model) {
                 model.insert({username: username, userpass: userpass}, (result: any, err: any) => {
                     if (err.length) {
@@ -106,7 +105,7 @@ class TAuthServer extends TObject {
     // Init Routes
     private InitRoutes(){
         // define route to user api
-        var user = this.hServer.UseRouter('/user');
+        var user = this._HttpServer.Router('/user');
 
         // define route to add user
         user.post('/', (req: Request, res: Response) => {
@@ -143,6 +142,20 @@ class TAuthServer extends TObject {
                 sendjson(res, 401, ['Not authorized.']);
             }
         });
+    }
+
+    private _authRoute(req: any, res: Response, next: NextFunction){
+        //this._session.handler(req, res, false);
+        this._session.session(req,res);
+        if (req.session) {
+            next();
+        } else {
+            sendjson(res, 401, ['Not authorized.']);
+        }
+    }
+    /** Auth Route Middleware */
+    public get AuthRoute(): RequestHandler{
+        return this._authRoute.bind(this);
     }
 }
 // ===================================================

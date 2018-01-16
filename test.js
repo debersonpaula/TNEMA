@@ -34,7 +34,9 @@ function startServer(){
     server.HttpServer.RouteStatic(__dirname + '/test/public');
 
     // add route to /test and send the content
-    server.HttpServer.RouteSendContent('/test','Test Sucessfully');
+    server.HttpServer.App.get('/test', (req, res) => {
+        res.send('Test Sucessfully');
+    });
     
     /*---------------------------------------------*/
     logger.writelnR('!FgGreen','=== CREATE APPLICATION ===');

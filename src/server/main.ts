@@ -5,6 +5,9 @@
 * dependencies: 
 * author: dpaula
 * https://github.com/debersonpaula
+*
+*
+* V.0.3.3
 */
 
 // ===================================================
@@ -40,10 +43,10 @@ class TNEMAServer extends TObjectList{
 
     // set or get http port
     get Port(): number {
-        return this._HttpServer.httpPort;
+        return this._HttpServer.HttpPort;
     }
     set Port(port: number) {
-        this._HttpServer.httpPort = port;
+        this._HttpServer.HttpPort = port;
     }
 
     // set or get mongo uri

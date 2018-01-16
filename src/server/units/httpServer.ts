@@ -6,7 +6,7 @@
 * https://github.com/debersonpaula
 *
 *
-* V.0.3.0
+* V.0.3.3
 */
 
 // ===================================================
@@ -23,34 +23,34 @@ import * as http from 'http';
 /** HTTP SERVER */
 class THttpServer extends TObject {
     // components
-    public app: express.Application;
-    protected server: http.Server;
-    public httpPort: number;
-    private connections: Array<any>;
+    private _app: express.Application;
+    private _server: http.Server;
+    private _httpPort: number;
+    private _connections: Array<any>;
 
     /** server constructor */
     constructor() {
         super();
-        this.app = express();
-        this.app.use(bodyParser.urlencoded({ extended: false }));
-        this.app.use(bodyParser.json());
-        this.app.use(cookieParser());
-        this.server = http.createServer(this.app);
-        this.connections = [];
+        this._app = express();
+        this._app.use(bodyParser.urlencoded({ extended: false }));
+        this._app.use(bodyParser.json());
+        this._app.use(cookieParser());
+        this._server = http.createServer(this._app);
+        this._connections = [];
     }
 
     /** start server */
     public Create(fn?: Function) {
         let ListenPort = 3000;
         const self = this;
-        if (!this.httpPort) {
+        if (!this._httpPort) {
             console.log('HTTP Port was not been assigned to options');
         }else {
-            ListenPort = this.httpPort || ListenPort;
+            ListenPort = this._httpPort || ListenPort;
             // enable destroy
-            enableDestroy(this.server);
+            enableDestroy(this._server);
             // listen to the port
-            this.server.listen(ListenPort, function(err: any) {
+            this._server.listen(ListenPort, function(err: any) {
                 if (err) {
                     console.log(`HTTP Server can't be active on port ${ListenPort}`);
                     throw err;
@@ -68,7 +68,7 @@ class THttpServer extends TObject {
         // clear all routes
         self.ClearRoutes();
         // close server connection
-        let server: any = this.server;
+        let server: any = this._server;
         // force all connections to disconnect
         server.destroy(function(){
             console.log(`HTTP Server Stopped.`);
@@ -76,72 +76,42 @@ class THttpServer extends TObject {
         });
     }
 
-    /** add router handler and returns IRoute object */
-    public Route(uri: string): express.IRoute {
-        return this.app.route(uri);
+    /** return express application */
+    get App(): express.Application {
+        return this._app;
     }
 
-    // add static route
+    /** return http port */
+    get HttpPort(): number {
+        return this._httpPort;
+    }
+
+    /** change http port */
+    set HttpPort(value: number) {
+        this._httpPort = value;
+    }
+
+    /** add static route */
     public RouteStatic(path: string) {
-        this.app.use(express.static(path));
+        this._app.use(express.static(path));
     }
 
-    // add route to specific file
-    public RouteSendFile(uri: string, filename: string, middleware?: express.RequestHandler) {
-        this.appGet(uri, middleware, (req, res) => {
-            res.sendFile(filename);
-        });
-    }
-
-    // add route to any content
-    public RouteSendContent(uri: string, content: any, middleware?: express.RequestHandler) {
-        this.appGet(uri, middleware, (req, res) => {
-            res.send(content);
-        });
-    }
-
-    // add route to send json
-    public RouteSendJSON(uri: string, content: Object, middleware?: express.RequestHandler) {
-        this.appGet(uri, middleware, (req, res) => {
-            res.json(content);
-        });
-    }
-
-    // add router use direct to handler
-    public Use(uri: string,  handler: any): void {
-        this.app.use(uri, handler);
-    }
-
-    // add router use Router handler
-    public UseRouter(uri: string): express.Router {
+    /** create Router based on URI and return it */
+    public Router(uri: string): express.Router {
         const router: express.Router = express.Router();
-        this.app.use(uri, router);
+        this._app.use(uri, router);
         return router;
     }
 
     // mount middleware
     public AddMiddleware(handler: express.RequestHandler){
-        this.app.use(handler);
+        this._app.use(handler);
     }
 
     // clear all routes
     private ClearRoutes(){
-        if (this.app._router.stack) this.app._router.stack = [];
-        this.app._router = undefined;
-    }
-
-    /** Define Route to Get */
-    private appGet(uri: string, middleware?: express.RequestHandler,
-            cb?: (req: express.Request, res: express.Response) => void){
-        if (middleware) {
-            this.app.get(uri, middleware, function(req, res){
-                cb && cb(req,res);
-            });
-        } else {
-            this.app.get(uri, function(req, res){
-                cb && cb(req,res);
-            });
-        }
+        if (this._app._router.stack) this._app._router.stack = [];
+        this._app._router = undefined;
     }
 }
 // ===================================================

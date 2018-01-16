@@ -54,7 +54,9 @@ To start a server with static routing on './public':
   server.HttpServer.RouteStatic(__dirname + '/public');
 
   // add route to /test and send the content
-  server.HttpServer.RouteSendContent('/test','Test Sucessfully');
+  server.HttpServer.App.get('/test', (req, res) => {
+      res.send('Test Sucessfully');
+  });
   
   // start server
   server.Create(function(){

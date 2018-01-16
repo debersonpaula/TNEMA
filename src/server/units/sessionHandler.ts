@@ -7,7 +7,7 @@
 * https://github.com/debersonpaula
 *
 *
-* V.0.3.0
+* V.0.3.3
 */
 
 import { RequestHandler, Request, Response, NextFunction } from 'express';
@@ -52,6 +52,11 @@ export class TSessionApp{
         return this._handler.bind(this);
     }
 
+    /** get session function */
+    get session(){
+        return this._getSession.bind(this);
+    }
+
     /** create a logged session and returns session */
     public createSession(req: any, res: any, data: any): TSession {
         // get cookies from user or create it if not exists
@@ -67,6 +72,7 @@ export class TSessionApp{
         return session;
     }
 
+    /** destroy a logged session */
     public destroySession(req: any, res: any): boolean{
         // get cookies from user or create it if not exists
         var sessionid = this._getCookie(req, res, this._options.appName);
@@ -84,14 +90,14 @@ export class TSessionApp{
         }
     }
 
-    private _handler(req: any, res: Response, next: NextFunction){
+    /** get session content */
+    private _getSession(req: any, res: any){
         // get cookies from user or create it if not exists
         var sessionid = this._getCookie(req, res, this._options.appName);
         // get session of user
         var session = this._findSession(sessionid);
         // check if user send token
         var tokenid = req.get('tokenid');
-
         if (session.tokenid === tokenid) {
             // authenticated session route
             req.session = session;
@@ -103,6 +109,10 @@ export class TSessionApp{
         if (this._options.filename) {
             this._sessions.save(this._options.filename);
         }
+    }
+
+    private _handler(req: Request, res: Response, next: NextFunction){
+        this._getSession(req,res);
         next();
     }
 
