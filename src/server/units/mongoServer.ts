@@ -4,6 +4,9 @@
 * scope: only server
 * author: dpaula
 * https://github.com/debersonpaula
+*
+*
+* V.0.3.0
 */
 
 // =========================================================================

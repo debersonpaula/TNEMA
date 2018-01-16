@@ -8,9 +8,12 @@ Work Progress:
 
  - Core functionalities: done
  - Http Server: done
- - MongoDB Server: remake
+ - MongoDB Server: done
  - Authentication Server: done
- - Security: working
+ - Security: in testing *
+
+*Security: express-session is no longer used. Instead, was create a cookie/token logic to authenticate users.
+*Clients should send tokenid every request to check authentication thru header (see test.js and test/ folder for example)
 
 ## Requirements
 

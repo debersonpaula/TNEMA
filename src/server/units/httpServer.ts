@@ -4,6 +4,9 @@
 * scope: only server
 * author: dpaula
 * https://github.com/debersonpaula
+*
+*
+* V.0.3.0
 */
 
 // ===================================================
@@ -11,11 +14,13 @@
 import { TObject } from 'tobjectlist';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import * as cookieParser from 'cookie-parser';
 import * as fs from 'fs';
 import * as http from 'http';
-import { RequestHandler } from '_debugger';
 // ===================================================
 // === classes =======================================
+
+/** HTTP SERVER */
 class THttpServer extends TObject {
     // components
     public app: express.Application;
@@ -23,22 +28,23 @@ class THttpServer extends TObject {
     public httpPort: number;
     private connections: Array<any>;
 
-    // constructor
+    /** server constructor */
     constructor() {
         super();
         this.app = express();
         this.app.use(bodyParser.urlencoded({ extended: false }));
         this.app.use(bodyParser.json());
+        this.app.use(cookieParser());
         this.server = http.createServer(this.app);
         this.connections = [];
     }
 
-    // start server
+    /** start server */
     public Create(fn?: Function) {
         let ListenPort = 3000;
         const self = this;
         if (!this.httpPort) {
-            throw 'HTTP Port was not been assigned to options';
+            console.log('HTTP Port was not been assigned to options');
         }else {
             ListenPort = this.httpPort || ListenPort;
             // enable destroy
@@ -56,7 +62,7 @@ class THttpServer extends TObject {
         }
     }
 
-    // stop server
+    /** stop server */
     public Destroy(fn?: Function) {
         const self = this;
         // clear all routes
@@ -65,11 +71,12 @@ class THttpServer extends TObject {
         let server: any = this.server;
         // force all connections to disconnect
         server.destroy(function(){
+            console.log(`HTTP Server Stopped.`);
             self.DoDestroy(fn);
         });
     }
 
-    // add router handler
+    /** add router handler and returns IRoute object */
     public Route(uri: string): express.IRoute {
         return this.app.route(uri);
     }
@@ -80,16 +87,23 @@ class THttpServer extends TObject {
     }
 
     // add route to specific file
-    public RouteSendFile(uri: string, filename: string) {
-        this.app.get(uri, function(req, res){
+    public RouteSendFile(uri: string, filename: string, middleware?: express.RequestHandler) {
+        this.appGet(uri, middleware, (req, res) => {
             res.sendFile(filename);
         });
     }
 
     // add route to any content
-    public RouteSendContent(uri: string, content: any) {
-        this.app.get(uri, function(req, res){
+    public RouteSendContent(uri: string, content: any, middleware?: express.RequestHandler) {
+        this.appGet(uri, middleware, (req, res) => {
             res.send(content);
+        });
+    }
+
+    // add route to send json
+    public RouteSendJSON(uri: string, content: Object, middleware?: express.RequestHandler) {
+        this.appGet(uri, middleware, (req, res) => {
+            res.json(content);
         });
     }
 
@@ -114,6 +128,20 @@ class THttpServer extends TObject {
     private ClearRoutes(){
         if (this.app._router.stack) this.app._router.stack = [];
         this.app._router = undefined;
+    }
+
+    /** Define Route to Get */
+    private appGet(uri: string, middleware?: express.RequestHandler,
+            cb?: (req: express.Request, res: express.Response) => void){
+        if (middleware) {
+            this.app.get(uri, middleware, function(req, res){
+                cb && cb(req,res);
+            });
+        } else {
+            this.app.get(uri, function(req, res){
+                cb && cb(req,res);
+            });
+        }
     }
 }
 // ===================================================

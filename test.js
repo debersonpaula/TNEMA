@@ -22,7 +22,7 @@ function startServer(){
     /*---------------------------------------------*/
     logger.writelnR('!FgCyan','=== START SERVER ===');
     tnema = require('./index');
-    server = new tnema.TNEMAServer('appTest','A123-Csd1-Apow');
+    server = new tnema.TNEMAServer('appTest','./appSessions.json');
 
     // define port
     server.Port = 3000;
