@@ -13,7 +13,7 @@ Work Progress:
  - Security: in testing *
 
 *Security: express-session is no longer used. Instead, was create a cookie/token logic to authenticate users.
-*Clients should send tokenid every request to check authentication thru header (see test.js and test/ folder for example)
+Clients should send tokenid every request to check authentication thru header (see test.js and test/ folder for example)
 
 ## Requirements
 
@@ -22,7 +22,7 @@ Work Progress:
 npm install typescript
 
 # also requires @types
-npm install @types/body-parser @types/express @types/express-session @types/mongoose
+npm install @types/body-parser @types/express @types/cookie-parser @types/mongoose
 ```
 
 Also requires an instance of MongoDB running.
