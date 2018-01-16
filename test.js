@@ -37,6 +37,11 @@ function startServer(){
     server.HttpServer.App.get('/test', (req, res) => {
         res.send('Test Sucessfully');
     });
+
+    // add route to /test and send the content
+    server.HttpServer.App.get('/auth', server.AuthServer.AuthRoute, (req, res) => {
+        res.send('Auth Sucessfully');
+    });
     
     /*---------------------------------------------*/
     logger.writelnR('!FgGreen','=== CREATE APPLICATION ===');

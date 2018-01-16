@@ -119,3 +119,8 @@ function GetToken() {
     }
 }
 /*---------------------------------------------------*/
+function testAuth() {
+    GetTNEMAContent('GET','/auth',function(res){
+        console.log('res = ', res);
+    });
+}

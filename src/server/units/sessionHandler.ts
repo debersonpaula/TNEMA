@@ -7,7 +7,7 @@
 * https://github.com/debersonpaula
 *
 *
-* V.0.3.3
+* V.0.3.5
 */
 
 import { RequestHandler, Request, Response, NextFunction } from 'express';
@@ -98,7 +98,7 @@ export class TSessionApp{
         var session = this._findSession(sessionid);
         // check if user send token
         var tokenid = req.get('tokenid');
-        if (session.tokenid === tokenid) {
+        if (session.tokenid === tokenid && tokenid != '') {
             // authenticated session route
             req.session = session;
         } else {
