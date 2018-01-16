@@ -41,8 +41,8 @@ To start a server with static routing on './public':
 ```js
   tnema = require('tnema');
   
-  // create server instance with session-name and session-file
-  server = new tnema.TNEMAServer('session-name','session-file');
+  // create server instance with session-name and session-file  
+  server = new tnema.TNEMAServer('sessionName','./appSessions.json');
   
   // define port
   server.Port = 3000;
