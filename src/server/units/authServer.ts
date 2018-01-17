@@ -8,6 +8,7 @@
 *
 *
 * V.0.3.3
+* V.0.3.6 - added schema list and options to authserver
 */
 
 // ===================================================
@@ -25,14 +26,39 @@ class TAuthServer extends TObject {
     private _HttpServer: THttpServer;
     private _MongoServer: TMongoServer;
     private _session: TSessionApp;
+    private _schemas: TSchema[];
+    private _options: any;
     
     // constructor
     constructor(HttpServer: THttpServer, MongoServer: TMongoServer, SessionID: string, SessionFile: string) {
         super();
         this._HttpServer = HttpServer;
         this._MongoServer = MongoServer;
-        //create store for session
+        // create store for session
         this._session = new TSessionApp({appName: SessionID, filename: SessionFile});
+        // initialize options
+        this._options = {
+            user: 'username',
+            pass: 'userpass',
+            users: 'dbUsers',
+            sessionInfo: ['username']
+        }
+        // initialize schemas
+        this._schemas = [
+            new TSchema(this._options.users ,{
+                username: {
+                    type: String,
+                    default: '',
+                    required: [true,'UserName is required'],
+                    unique: [true,'This UserName already exists']
+                },
+                userpass: {
+                    type: String,
+                    default: '',
+                    required: [true,'Password is required'],
+                }
+            })
+        ];
     }
 
     // start server
@@ -49,26 +75,39 @@ class TAuthServer extends TObject {
         this.DoDestroy(fn);
     }
 
+    // overwrite schemas
+    public OverwriteSchemas(schemas: TSchema[]) {
+        this._schemas = schemas;
+    }
+
+    // overwrite options
+    public OverwriteOptions(options: any) {
+        for (var field in options) {
+            this._options[field] = options[field];
+        }
+    }
+
     // get all models from DefAStandard
     private InitStandardModels(){
         if (this._MongoServer){
-            DefAStandard.StandardModels.forEach(modelSchema => {
+            this._schemas.forEach(modelSchema => {
                 this._MongoServer.AddModel(modelSchema);
             });
         }
     }
 
     //Login User
-    private UserLogin(username: string, userpass: string, res: Response, req: any): void {
-        // const self = this;
+    private setLogin(req: any, res: Response): void {
+        const username = req.body[ this._options.user ];
+        const userpass = req.body[ this._options.pass ];
         if (username && userpass){
-            const getdata: TModel = this._MongoServer.SearchModel('dbUsers');
+            const getdata: TModel = this._MongoServer.SearchModel( this._options.users );
             if (getdata) {
                 // locate if the user and pass matches
                 getdata.find({username: username, userpass: userpass}, (result) => {
                     // if result > 0, user found
-                    if (result.length){
-                        let tokenid = this._session.createSession(req, res, {username: username}).tokenid;
+                    if (result.length > 0){
+                        let tokenid = this._session.createSession(req, res, this.getSessionData(result[0])).tokenid;
                         sendjson(res, 200, [{tokenid: tokenid}]);
                     } else {
                         sendjson(res, 403, ['User and Password not match.']);
@@ -81,25 +120,28 @@ class TAuthServer extends TObject {
     }
 
     //Register User
-    private RegisterLogin(username: string, userpass: string, userpass2: string,
-                          res: Response, req: any): void {
+    private setRegister(req: any, res: Response): void {
+        const userData = req.body;
+        const model: TModel = this._MongoServer.SearchModel( this._options.users );
+        if (model) {
+            model.insert(userData, (result: any, err: any) => {
+                if (err.length) {
+                    sendjson(res, 403, err);
+                } else {
+                    // create session, get token id and send it to the requester
+                    const tokenid = this._session.createSession(req, res, this.getSessionData(userData)).tokenid;
+                    sendjson(res, 200, [{tokenid: tokenid}]);
+                }
+            });
+        }
+    }
 
-        if (!username || !userpass || userpass !== userpass2) {
-            sendjson(res, 403, ['User Name and Password fields cant be blank '+
-                    'and Passwords should be the same.']);
-        } else {
-            const model: TModel = this._MongoServer.SearchModel('dbUsers');
-            if (model) {
-                model.insert({username: username, userpass: userpass}, (result: any, err: any) => {
-                    if (err.length) {
-                        sendjson(res, 403, err);
-                    } else {
-                        let tokenid = this._session.createSession(req, res, {username: username}).tokenid;
-                        sendjson(res, 200, [{tokenid: tokenid}]);
-                    }
-                });
-            }
-        }        
+    private getSessionData(source: any) {
+        var dest: any = {};
+        this._options.sessionInfo.forEach( (element: string) => {
+            dest[element] = source[element];
+        });
+        return dest;
     }
 
     // Init Routes
@@ -109,19 +151,12 @@ class TAuthServer extends TObject {
 
         // define route to add user
         user.post('/', (req: Request, res: Response) => {
-            this.RegisterLogin(
-                req.body.username,
-                req.body.userpass,
-                req.body.userpass2,
-                res, req);
+            this.setRegister(req, res);
         });
 
         // define route to log user
         user.post('/login', (req: Request, res: Response) => {
-            this.UserLogin(
-                req.body.username,
-                req.body.userpass,
-                res, req);
+            this.setLogin(req, res);
         });
 
         // define route to logout
@@ -145,7 +180,6 @@ class TAuthServer extends TObject {
     }
 
     private _authRoute(req: any, res: Response, next: NextFunction){
-        //this._session.handler(req, res, false);
         this._session.session(req,res);
         if (req.session) {
             next();
@@ -171,21 +205,3 @@ function sendjson(res: Response, status: number, msg: any[]) {
 // === exports =======================================
 // ===================================================
 export { TAuthServer };
-
-export let DefAStandard = {
-    StandardModels: [
-        new TSchema('dbUsers',{
-            username: {
-                type: String,
-                default: '',
-                required: [true,'UserName is required'],
-                unique: [true,'This UserName already exists']
-            },
-            userpass: {
-                type: String,
-                default: '',
-                required: [true,'Password is required'],
-            }
-        })
-    ]
-};

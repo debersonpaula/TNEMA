@@ -8,13 +8,14 @@
 *
 *
 * V.0.3.3
+* V.0.3.6 - added TSchema, TModel to export
 */
 
 // ===================================================
 // === imports =======================================
 import { TObjectList } from 'tobjectlist';
 import { THttpServer } from './units/httpServer';
-import { TMongoServer } from './units/mongoServer';
+import { TMongoServer, TSchema, TModel } from './units/mongoServer';
 import { TAuthServer } from './units/authServer';
 // ===================================================
 // === classes =======================================
@@ -59,4 +60,4 @@ class TNEMAServer extends TObjectList{
 }
 // ===================================================
 // === exports =======================================
-export {TNEMAServer}
+export {TNEMAServer, TSchema, TModel}

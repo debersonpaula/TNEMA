@@ -1,6 +1,6 @@
 import { TObjectList } from 'tobjectlist';
 import { THttpServer } from './units/httpServer';
-import { TMongoServer } from './units/mongoServer';
+import { TMongoServer, TSchema, TModel } from './units/mongoServer';
 import { TAuthServer } from './units/authServer';
 declare class TNEMAServer extends TObjectList {
     private _HttpServer;
@@ -13,4 +13,4 @@ declare class TNEMAServer extends TObjectList {
     Port: number;
     MongoSource: string;
 }
-export { TNEMAServer };
+export { TNEMAServer, TSchema, TModel };

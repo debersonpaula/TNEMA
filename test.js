@@ -42,6 +42,38 @@ function startServer(){
     server.HttpServer.App.get('/auth', server.AuthServer.AuthRoute, (req, res) => {
         res.send('Auth Sucessfully');
     });
+
+    // custom schema and options
+    server.AuthServer.OverwriteSchemas([
+        new tnema.TSchema('dbUsers' ,{
+            username: {
+                type: String,
+                default: '',
+                required: [true,'UserName is required'],
+                unique: [true,'This UserName already exists']
+            },
+            userpass: {
+                type: String,
+                default: '',
+                required: [true,'Password is required'],
+            },
+            firstname: {
+                type: String,
+                default: '',
+                required: [true, 'First name of user is required']
+            },
+            lastname: {
+                type: String,
+                default: '',
+                required: [true, 'Last name of user is required']
+            }
+        })
+    ]);
+
+    server.AuthServer.OverwriteOptions({
+        sessionInfo: ['username','firstname','lastname']
+    });
+    
     
     /*---------------------------------------------*/
     logger.writelnR('!FgGreen','=== CREATE APPLICATION ===');

@@ -12,11 +12,19 @@
         </div>
         <div>
             <label>Password:</label>
-            <input type="password" name="userpass"/>
+            <input type="password" id="userpass" name="userpass"/>
         </div>
         <div>
             <label>Confirm Password:</label>
-            <input type="password" name="userpass2"/>
+            <input type="password" id="userpass2"/>
+        </div>
+        <div>
+            <label>First Name:</label>
+            <input type="text" name="firstname"/>
+        </div>
+        <div>
+            <label>Last name:</label>
+            <input type="text" name="lastname"/>
         </div>
         <div>
             <input type="submit" value="Submit"/>
@@ -29,31 +37,6 @@
 
     <script>
         DefineRegister('#formRegistration');
-        /*
-        var form = $('#formRegistration');
-
-        
-        
-        form.submit(function( event ) {
-            var formData = form.serialize();
-
-            var sendAjax = $.ajax({
-                type : 'POST',
-                url  : '/user',
-                data : formData,
-                dataType : 'json',
-                encode : true
-            });
-
-            sendAjax.done(function(data){
-                console.log(data);
-            });
-
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
-        });
-        */
     </script>
 </body>
 </html>

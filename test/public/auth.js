@@ -40,7 +40,7 @@ function CheckSession(elementID){
     var panel = $(elementID);
     GetTNEMAContent('GET','/user',function(res){
         if (res.status == 200) {
-            panel.html('Hello ' + res.messages[0].username + ' | <button id="logout">Logout</button>');
+            panel.html('Hello ' + res.messages[0].firstname + ' ' + res.messages[0].lastname + ' | <button id="logout">Logout</button>');
             $('#logout').click(function(){
                 DoLogout();
             });
@@ -63,18 +63,23 @@ function DoLogout(){
 function DefineRegister(elementID){
     var form = $(elementID);
     form.submit(function( event ) {
-        var formData = form.serialize();
-        SetTNEMAContent('POST','/user',formData,function(res){
-            if (res.status == 200) {
-                // on sucess, reload page
-                var tokenid = res.messages[0].tokenid;
-                StoreToken(tokenid);
-                window.location.replace('/');
-            } else {
-                // on fail, show error
-                $('#registermsg').html(res.messages.toString());
-            }
-        });
+        if ($('#userpass').val() === $('#userpass2').val()) {
+            var formData = form.serialize();
+            SetTNEMAContent('POST','/user',formData,function(res){
+                if (res.status == 200) {
+                    // on sucess, reload page
+                    var tokenid = res.messages[0].tokenid;
+                    StoreToken(tokenid);
+                    window.location.replace('/');
+                } else {
+                    // on fail, show error
+                    $('#registermsg').html(res.messages.toString());
+                }
+            });
+        } else {
+            $('#registermsg').html('Password confirmation should be exactly');
+        }
+        
         event.preventDefault();
     });
 }

@@ -7,18 +7,20 @@ declare class TAuthServer extends TObject {
     private _HttpServer;
     private _MongoServer;
     private _session;
+    private _schemas;
+    private _options;
     constructor(HttpServer: THttpServer, MongoServer: TMongoServer, SessionID: string, SessionFile: string);
     Create(fn?: Function): void;
     Destroy(fn?: Function): void;
+    OverwriteSchemas(schemas: TSchema[]): void;
+    OverwriteOptions(options: any): void;
     private InitStandardModels();
-    private UserLogin(username, userpass, res, req);
-    private RegisterLogin(username, userpass, userpass2, res, req);
+    private setLogin(req, res);
+    private setRegister(req, res);
+    private getSessionData(source);
     private InitRoutes();
     private _authRoute(req, res, next);
     /** Auth Route Middleware */
     readonly AuthRoute: RequestHandler;
 }
 export { TAuthServer };
-export declare let DefAStandard: {
-    StandardModels: TSchema[];
-};
