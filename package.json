@@ -1,6 +1,6 @@
 {
   "name": "tnema",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "TNEMA Server",
   "main": "index.js",
   "scripts": {
