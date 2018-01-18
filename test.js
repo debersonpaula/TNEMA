@@ -28,7 +28,7 @@ function startServer(){
     server.Port = 3000;
 
     // define the source of mongodb
-    server.MongoSource = 'mongodb://localhost/test';
+    server.MongoSource = 'mongodb://127.0.0.1/test';
 
     // add static route to public folder
     server.HttpServer.RouteStatic(__dirname + '/test/public');
@@ -71,7 +71,7 @@ function startServer(){
     ]);
 
     server.AuthServer.OverwriteOptions({
-        sessionInfo: ['username','firstname','lastname']
+        sessionInfo: ['_id','username','firstname','lastname']
     });
     
     

@@ -9,6 +9,7 @@
 *
 * V.0.3.3
 * V.0.3.6 - added schema list and options to authserver
+* V.0.3.7 - reviewed get session
 */
 
 // ===================================================
@@ -41,7 +42,7 @@ class TAuthServer extends TObject {
             user: 'username',
             pass: 'userpass',
             users: 'dbUsers',
-            sessionInfo: ['username']
+            sessionInfo: ['_id', 'username']
         }
         // initialize schemas
         this._schemas = [
@@ -129,7 +130,7 @@ class TAuthServer extends TObject {
                     sendjson(res, 403, err);
                 } else {
                     // create session, get token id and send it to the requester
-                    const tokenid = this._session.createSession(req, res, this.getSessionData(userData)).tokenid;
+                    const tokenid = this._session.createSession(req, res, this.getSessionData(result)).tokenid;
                     sendjson(res, 200, [{tokenid: tokenid}]);
                 }
             });
