@@ -7,6 +7,7 @@
 *
 *
 * V.0.3.3
+* V.0.3.9 - Corrected Clear Routes
 */
 
 // ===================================================
@@ -111,7 +112,7 @@ class THttpServer extends TObject {
     // clear all routes
     private ClearRoutes(){
         if (this._app._router.stack) this._app._router.stack = [];
-        this._app._router = undefined;
+        // this._app._router = undefined;
     }
 }
 // ===================================================
