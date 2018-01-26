@@ -7,6 +7,7 @@
 *
 *
 * V.0.3.0
+* V.0.4.0 - reviewed mongoclient
 */
 
 // =========================================================================
@@ -136,7 +137,8 @@ export class TMongoServer extends TObject {
         const self = this;
         const dbURI: string = this.mongoURL;
         if (dbURI) {
-            this.mongoApp.connect(dbURI, {useMongoClient: true}, function(){
+            //this.mongoApp.connect(dbURI, {useMongoClient: true}, function(){
+            this.mongoApp.connect(dbURI, function(){
                 self.DoCreate(fn);
             });
         }

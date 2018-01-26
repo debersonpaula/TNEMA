@@ -8,6 +8,7 @@
 *
 * V.0.3.3
 * V.0.3.9 - Corrected Clear Routes
+* V.0.4.0 - Removed Clear Routes
 */
 
 // ===================================================
@@ -67,7 +68,7 @@ class THttpServer extends TObject {
     public Destroy(fn?: Function) {
         const self = this;
         // clear all routes
-        self.ClearRoutes();
+        // self.ClearRoutes();
         // close server connection
         let server: any = this._server;
         // force all connections to disconnect
@@ -111,7 +112,7 @@ class THttpServer extends TObject {
 
     // clear all routes
     private ClearRoutes(){
-        if (this._app._router.stack) this._app._router.stack = [];
+        // if (this._app._router.stack) this._app._router.stack = [];
         // this._app._router = undefined;
     }
 }

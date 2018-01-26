@@ -1,120 +1,62 @@
 const logger = require("debugtxt");
-const decache = require('decache');
-const comp = require("tscbuilder");
 
+/*---------------------------------------------*/
+logger.writelnR('!FgCyan','=== START SERVER ===');
+tnema = require('./index');
+server = new tnema.TNEMAServer('appTest','./appSessions.json');
 
-// declare vars
-var tnema;
-var server;
+// define port
+server.Port = 3000;
 
-// run first
-startServer();
+// define the source of mongodb
+server.MongoSource = 'mongodb://127.0.0.1/test';
 
-/************************************************************/
-/************************************************************/
-/************************************************************/
-function startServer(){
-    /*---------------------------------------------*/
-    logger.writelnR('!FgBlue','==================================================================');
-    logger.writelnR('!FgCyan','=== START COMPILATION ===');
-    comp.CompileTSC(__dirname + '/tsconfig.json');
+// add static route to public folder
+server.HttpServer.RouteStatic(__dirname + '/test/public');
 
-    /*---------------------------------------------*/
-    logger.writelnR('!FgCyan','=== START SERVER ===');
-    tnema = require('./index');
-    server = new tnema.TNEMAServer('appTest','./appSessions.json');
+// add route to /test and send the content
+server.HttpServer.App.get('/test', (req, res) => {
+    res.send('Test Sucessfully');
+});
 
-    // define port
-    server.Port = 3000;
+// add route to /test and send the content
+server.HttpServer.App.get('/auth', server.AuthServer.AuthRoute, (req, res) => {
+    res.send('Auth Sucessfully');
+});
 
-    // define the source of mongodb
-    server.MongoSource = 'mongodb://127.0.0.1/test';
+// custom schema and options
+server.AuthServer.OverwriteSchemas([
+    new tnema.TSchema('dbUsers' ,{
+        username: {
+            type: String,
+            default: '',
+            required: [true,'UserName is required'],
+            unique: [true,'This UserName already exists']
+        },
+        userpass: {
+            type: String,
+            default: '',
+            required: [true,'Password is required'],
+        },
+        firstname: {
+            type: String,
+            default: '',
+            required: [true, 'First name of user is required']
+        },
+        lastname: {
+            type: String,
+            default: '',
+            required: [true, 'Last name of user is required']
+        }
+    })
+]);
 
-    // add static route to public folder
-    server.HttpServer.RouteStatic(__dirname + '/test/public');
+server.AuthServer.OverwriteOptions({
+    sessionInfo: ['_id','username','firstname','lastname']
+});
 
-    // add route to /test and send the content
-    server.HttpServer.App.get('/test', (req, res) => {
-        res.send('Test Sucessfully');
-    });
-
-    // add route to /test and send the content
-    server.HttpServer.App.get('/auth', server.AuthServer.AuthRoute, (req, res) => {
-        res.send('Auth Sucessfully');
-    });
-
-    // custom schema and options
-    server.AuthServer.OverwriteSchemas([
-        new tnema.TSchema('dbUsers' ,{
-            username: {
-                type: String,
-                default: '',
-                required: [true,'UserName is required'],
-                unique: [true,'This UserName already exists']
-            },
-            userpass: {
-                type: String,
-                default: '',
-                required: [true,'Password is required'],
-            },
-            firstname: {
-                type: String,
-                default: '',
-                required: [true, 'First name of user is required']
-            },
-            lastname: {
-                type: String,
-                default: '',
-                required: [true, 'Last name of user is required']
-            }
-        })
-    ]);
-
-    server.AuthServer.OverwriteOptions({
-        sessionInfo: ['_id','username','firstname','lastname']
-    });
-    
-    
-    /*---------------------------------------------*/
-    logger.writelnR('!FgGreen','=== CREATE APPLICATION ===');
-    server.Create(function(){
-        logger.writelnR('!FgGreen','=== READY ===');
-        runWatch();
-    });
-}
-/************************************************************/
-/************************************************************/
-/************************************************************/
-function runWatch(){
-    /*---------------------------------------------*/
-    logger.writelnR('!FgCyan','=== RUNNING WATCH ===');
-    var watcher = comp.Watcher(__dirname + '/src/server/',function(){
-        logger.writelnR('!FgGreen','Rebuild');
-        watcher.close();
-        stopServer();
-    });
-}
-/************************************************************/
-/************************************************************/
-/************************************************************/
-function stopServer() {
-    /*---------------------------------------------*/
-    logger.writelnR('!FgCyan','=== STOPPING SERVER ===');
-    server.Destroy(function(){
-
-        // clear cache of server component
-        logger.writelnR('!FgBlue','Clear cache of server component');
-        decache('./index');
-        tnema = undefined;
-        server = undefined;
-
-        // restart server
-        logger.writelnR('!FgCyan','\nRestarting server...');
-        setTimeout(() => {
-            startServer();    
-        }, 500);
-    });
-}
-/************************************************************/
-/************************************************************/
-/************************************************************/
+/*---------------------------------------------*/
+logger.writelnR('!FgGreen','=== CREATE APPLICATION ===');
+server.Create(function(){
+    logger.writelnR('!FgGreen','=== READY ===');
+});
