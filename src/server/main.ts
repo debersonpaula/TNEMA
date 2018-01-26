@@ -9,6 +9,7 @@
 *
 * V.0.3.3
 * V.0.3.6 - added TSchema, TModel to export
+* V.0.4.0 - general updates
 */
 
 // ===================================================
