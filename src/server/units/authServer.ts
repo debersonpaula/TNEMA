@@ -10,6 +10,7 @@
 * V.0.3.3
 * V.0.3.6 - added schema list and options to authserver
 * V.0.3.7 - reviewed get session
+* V.0.4.2 - reviewed senders
 */
 
 // ===================================================
@@ -29,7 +30,7 @@ class TAuthServer extends TObject {
     private _session: TSessionApp;
     private _schemas: TSchema[];
     private _options: any;
-    
+
     // constructor
     constructor(HttpServer: THttpServer, MongoServer: TMongoServer, SessionID: string, SessionFile: string) {
         super();
@@ -60,6 +61,11 @@ class TAuthServer extends TObject {
                 }
             })
         ];
+    }
+
+    // properties
+    get Session(): TSessionApp {
+        return this._session;
     }
 
     // start server
@@ -109,14 +115,14 @@ class TAuthServer extends TObject {
                     // if result > 0, user found
                     if (result.length > 0){
                         let tokenid = this._session.createSession(req, res, this.getSessionData(result[0])).tokenid;
-                        sendjson(res, 200, [{tokenid: tokenid}]);
+                        res.sendData(200, [{tokenid: tokenid}]);
                     } else {
-                        sendjson(res, 403, ['User and Password not match.']);
+                        res.sendData(403, ['User and Password not match.']);
                     }
                 });
             }
         } else {
-            sendjson(res, 403, ['User Name and Password fields cant be blank.']);
+            res.sendData(403, ['User Name and Password fields cant be blank.']);
         }
     }
 
@@ -127,11 +133,11 @@ class TAuthServer extends TObject {
         if (model) {
             model.insert(userData, (result: any, err: any) => {
                 if (err.length) {
-                    sendjson(res, 403, err);
+                    res.sendData(403, err);
                 } else {
                     // create session, get token id and send it to the requester
                     const tokenid = this._session.createSession(req, res, this.getSessionData(result)).tokenid;
-                    sendjson(res, 200, [{tokenid: tokenid}]);
+                    res.sendData(200, [{tokenid: tokenid}]);
                 }
             });
         }
@@ -164,18 +170,18 @@ class TAuthServer extends TObject {
         user.get('/logout', this._session.handler, (req: any, res: Response) => {
             if (req.session) {
                 this._session.destroySession(req, res);
-                sendjson(res, 200, [] );
+                res.sendData(200, []);
             } else {
-                sendjson(res, 401, ['Not authorized.']);
+                res.sendData(401, ['Not authorized.']);
             }
         });
 
         // define route to get user session
         user.get('/', this._session.handler, (req: any, res: Response) => {
             if (req.session) {
-                sendjson(res, 200, [req.session.data] );
+                res.sendData(200, [req.session.data] );
             } else {
-                sendjson(res, 401, ['Not authorized.']);
+                res.sendData(401, ['Not authorized.']);
             }
         });
     }
@@ -185,22 +191,13 @@ class TAuthServer extends TObject {
         if (req.session) {
             next();
         } else {
-            sendjson(res, 401, ['Not authorized.']);
+            res.sendData(401, ['Not authorized.']);
         }
     }
     /** Auth Route Middleware */
     public get AuthRoute(): RequestHandler{
         return this._authRoute.bind(this);
     }
-}
-// ===================================================
-// === general methods ===============================
-// ===================================================
-function sendjson(res: Response, status: number, msg: any[]) {
-    res.status(status).json({
-        messages: msg,
-        status: status
-    });
 }
 // ===================================================
 // === exports =======================================

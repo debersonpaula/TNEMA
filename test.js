@@ -2,21 +2,25 @@ const logger = require("debugtxt");
 
 /*---------------------------------------------*/
 logger.writelnR('!FgCyan','=== START SERVER ===');
-tnema = require('./index');
-server = new tnema.TNEMAServer('appTest','./appSessions.json');
+var tnema = require('./index');
+var server = new tnema.TNEMAServer('appTest','./appSessions.json');
+
+
 
 // define port
 server.Port = 3000;
+// maxage = days * hours * minutes * seconds * ms
+server.Options.maxAge = 30 * 24 * 60 * 60 * 1000;
 
 // define the source of mongodb
 server.MongoSource = 'mongodb://127.0.0.1/test';
 
 // add static route to public folder
-server.HttpServer.RouteStatic(__dirname + '/test/public');
+server.RouteStatic = __dirname + '/test/public';
 
 // add route to /test and send the content
 server.HttpServer.App.get('/test', (req, res) => {
-    res.send('Test Sucessfully');
+    res.sendData(200, ['Test']);
 });
 
 // add route to /test and send the content

@@ -1,11 +1,19 @@
 /// <reference types="express" />
 import { RequestHandler } from 'express';
 import { TSession } from './sessionInfo';
+export declare class TOptions {
+    cryptoSize: number;
+    maxAge: number;
+    appName: string;
+    filename: string;
+    constructor();
+}
 /** Session Manager App */
 export declare class TSessionApp {
     private _options;
     private _sessions;
     constructor(options?: any);
+    readonly Options: TOptions;
     /** get session handler middleware */
     readonly handler: RequestHandler;
     /** get session function */

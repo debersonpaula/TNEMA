@@ -9,6 +9,7 @@
 * V.0.3.3
 * V.0.3.9 - Corrected Clear Routes
 * V.0.4.0 - Removed Clear Routes
+* V.0.4.2 - Added standard response sender
 */
 
 // ===================================================
@@ -21,6 +22,13 @@ import * as fs from 'fs';
 import * as http from 'http';
 // ===================================================
 // === classes =======================================
+declare global {
+    namespace Express {
+        interface Response {
+            sendData: (status: number, data: any[]) => void
+        }
+    }
+}
 
 /** HTTP SERVER */
 class THttpServer extends TObject {
@@ -37,6 +45,7 @@ class THttpServer extends TObject {
         this._app.use(bodyParser.urlencoded({ extended: false }));
         this._app.use(bodyParser.json());
         this._app.use(cookieParser());
+        this._app.use(this.StandardSender);
         this._server = http.createServer(this._app);
         this._connections = [];
     }
@@ -67,8 +76,6 @@ class THttpServer extends TObject {
     /** stop server */
     public Destroy(fn?: Function) {
         const self = this;
-        // clear all routes
-        // self.ClearRoutes();
         // close server connection
         let server: any = this._server;
         // force all connections to disconnect
@@ -110,10 +117,11 @@ class THttpServer extends TObject {
         this._app.use(handler);
     }
 
-    // clear all routes
-    private ClearRoutes(){
-        // if (this._app._router.stack) this._app._router.stack = [];
-        // this._app._router = undefined;
+    private StandardSender(req: any, res: any, next: any) {
+        res.sendData = (status: number, data: any[]) => {
+            return res.status(status).json({data: data, status: status});
+        }
+        next();
     }
 }
 // ===================================================

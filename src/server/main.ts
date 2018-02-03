@@ -10,6 +10,7 @@
 * V.0.3.3
 * V.0.3.6 - added TSchema, TModel to export
 * V.0.4.0 - general updates
+* V.0.4.2 - added forward to htpp functions
 */
 
 // ===================================================
@@ -18,6 +19,7 @@ import { TObjectList } from 'tobjectlist';
 import { THttpServer } from './units/httpServer';
 import { TMongoServer, TSchema, TModel } from './units/mongoServer';
 import { TAuthServer } from './units/authServer';
+import { TOptions } from './units/sessionHandler';
 // ===================================================
 // === classes =======================================
 class TNEMAServer extends TObjectList{
@@ -25,6 +27,7 @@ class TNEMAServer extends TObjectList{
     private _MongoServer: TMongoServer;
     private _AuthServer: TAuthServer;
 
+    //---------------------------------------------------------------
     constructor(SessionID: string, SessionFile: string) {
         super();
         // initialize servers
@@ -43,20 +46,34 @@ class TNEMAServer extends TObjectList{
     get MongoServer(): TMongoServer { return this._MongoServer };
     get AuthServer(): TAuthServer { return this._AuthServer };
 
-    // set or get http port
+    //---------------------------------------------------------------
+    /** Get HTTP Port */
     get Port(): number {
         return this._HttpServer.HttpPort;
     }
+    /** Set HTTP Port */
     set Port(port: number) {
         this._HttpServer.HttpPort = port;
     }
 
-    // set or get mongo uri
+    //---------------------------------------------------------------
+    /** Get MongoSource */
     get MongoSource(): string {
         return this._MongoServer.mongoURL;
     }
+    /** Set MongoSource */
     set MongoSource(url: string) {
         this._MongoServer.mongoURL = url;
+    }
+
+    //---------------------------------------------------------------
+    /** Set static route to path */
+    set RouteStatic(path: string) {
+        this._HttpServer.RouteStatic(path);
+    }
+
+    get Options(): TOptions {
+        return this._AuthServer.Session.Options;
     }
 }
 // ===================================================

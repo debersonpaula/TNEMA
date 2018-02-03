@@ -1,6 +1,13 @@
 /// <reference types="express" />
 import { TObject } from 'tobjectlist';
 import * as express from 'express';
+declare global  {
+    namespace Express {
+        interface Response {
+            sendData: (status: number, data: any[]) => void;
+        }
+    }
+}
 /** HTTP SERVER */
 declare class THttpServer extends TObject {
     private _app;
@@ -23,6 +30,6 @@ declare class THttpServer extends TObject {
     /** create Router based on URI and return it */
     Router(uri: string): express.Router;
     AddMiddleware(handler: express.RequestHandler): void;
-    private ClearRoutes();
+    private StandardSender(req, res, next);
 }
 export { THttpServer };

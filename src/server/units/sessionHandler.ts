@@ -14,7 +14,7 @@ import { RequestHandler, Request, Response, NextFunction } from 'express';
 import * as crypto from 'crypto';
 import { TSessions, TSession } from './sessionInfo';
 
-class TOptions {
+export class TOptions {
     cryptoSize: number;
     maxAge: number;
     appName: string;
@@ -45,6 +45,10 @@ export class TSessionApp{
         if (this._options.filename) {
             this._sessions.load(this._options.filename);
         }
+    }
+
+    get Options(): TOptions {
+        return this._options;
     }
 
     /** get session handler middleware */

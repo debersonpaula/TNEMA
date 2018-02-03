@@ -3,6 +3,7 @@ import { TObject } from 'tobjectlist';
 import { THttpServer } from './httpServer';
 import { TSchema, TMongoServer } from './mongoServer';
 import { RequestHandler } from 'express';
+import { TSessionApp } from './sessionHandler';
 declare class TAuthServer extends TObject {
     private _HttpServer;
     private _MongoServer;
@@ -10,6 +11,7 @@ declare class TAuthServer extends TObject {
     private _schemas;
     private _options;
     constructor(HttpServer: THttpServer, MongoServer: TMongoServer, SessionID: string, SessionFile: string);
+    readonly Session: TSessionApp;
     Create(fn?: Function): void;
     Destroy(fn?: Function): void;
     OverwriteSchemas(schemas: TSchema[]): void;

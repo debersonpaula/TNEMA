@@ -40,7 +40,8 @@ function CheckSession(elementID){
     var panel = $(elementID);
     GetTNEMAContent('GET','/user',function(res){
         if (res.status == 200) {
-            panel.html('Hello ' + res.messages[0].firstname + ' ' + res.messages[0].lastname + ' | <button id="logout">Logout</button>');
+            var data = res.data[0];
+            panel.html('Hello ' + data.firstname + ' ' + data.lastname + ' | <button id="logout">Logout</button>');
             $('#logout').click(function(){
                 DoLogout();
             });
@@ -67,13 +68,14 @@ function DefineRegister(elementID){
             var formData = form.serialize();
             SetTNEMAContent('POST','/user',formData,function(res){
                 if (res.status == 200) {
+                    var data = res.data[0];
                     // on sucess, reload page
-                    var tokenid = res.messages[0].tokenid;
+                    var tokenid = data.tokenid;
                     StoreToken(tokenid);
                     window.location.replace('/');
                 } else {
                     // on fail, show error
-                    $('#registermsg').html(res.messages.toString());
+                    $('#registermsg').html(res.data.toString());
                 }
             });
         } else {
@@ -91,13 +93,14 @@ function DefineFormLogin(elementID){
         var formData = form.serialize();
         SetTNEMAContent('POST','/user/login',formData,function(res){
             if (res.status == 200) {
+                var data = res.data[0];
                 // on sucess, reload page
-                var tokenid = res.messages[0].tokenid;
+                var tokenid = data.tokenid;
                 StoreToken(tokenid);
                 window.location.replace('/');
             } else {
                 // on fail, show error
-                $('#loginmsg').html(res.messages.toString());
+                $('#loginmsg').html(res.data.toString());
             }
         });
         event.preventDefault();
