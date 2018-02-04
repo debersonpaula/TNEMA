@@ -9,7 +9,8 @@ var server = new tnema.TNEMAServer('appTest','./appSessions.json');
 
 // define port
 server.Port = 3000;
-// maxage = days * hours * minutes * seconds * ms
+
+// define cookie maxage = days * hours * minutes * seconds * ms
 server.Options.maxAge = 30 * 24 * 60 * 60 * 1000;
 
 // define the source of mongodb

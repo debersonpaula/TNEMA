@@ -46,6 +46,9 @@ To start a server with static routing on './public':
   
   // define port
   server.Port = 3000;
+
+  // define cookie maxage = days * hours * minutes * seconds * ms
+  server.Options.maxAge = 30 * 24 * 60 * 60 * 1000;
   
   // define the source of mongodb
   server.MongoSource = 'mongodb://localhost/test';
