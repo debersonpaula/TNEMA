@@ -17,7 +17,9 @@ export class TSession {
     sessionid: string;
     tokenid: string;
     constructor(sessionid: string) {
-        this.clear();
+        // this.clear();
+        this.data = {};
+        this.tokenid = '';
         this.sessionid = sessionid;
     }
     clear() {
