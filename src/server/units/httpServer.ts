@@ -35,7 +35,7 @@ class THttpServer extends TObject {
     // components
     private _app: express.Application;
     private _server: http.Server;
-    private _httpPort: number;
+    private _httpPort?: number;
     private _connections: Array<any>;
 
     /** server constructor */
@@ -92,7 +92,7 @@ class THttpServer extends TObject {
 
     /** return http port */
     get HttpPort(): number {
-        return this._httpPort;
+        return this._httpPort || 0;
     }
 
     /** change http port */
